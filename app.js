@@ -1,4 +1,5 @@
 
+
 /* 家日曆 v1.9.0 — Google Sheets + Apps Script 雲端同步 */
 'use strict';
 // localStorage 在限制環境中可能被瀏覽器拒絕，確保核心功能仍可操作。
@@ -638,47 +639,75 @@ function sheetURL(u){
 }
 function sheetKey(value){const x=String(value||'').trim();if(!/^[a-fA-F0-9]{64}$/.test(x))throw Error('請填入 「家日曆設定」選單產生的 64 碼家庭共用密鑰');return x.toLowerCase()}
 function sheetNonce(){return [...crypto.getRandomValues(new Uint8Array(18))].map(v=>v.toString(16).padStart(2,'0')).join('')}
+/* V1.9.1 手機免 iframe 傳輸。讀取：時效簽章的 JSONP；寫入：no-cors POST 後讀回核對。 */
 function closeBridge(){
- if(sheetSync.bridge){sheetSync.bridge.remove();sheetSync.bridge=null}
- sheetSync.bridgeWindow=null;sheetSync.bridgeOrigin='';
- for(const {reject} of sheetSync.pending.values())reject(Error('連線已關閉'));
- sheetSync.pending.clear();
+  if(sheetSync.bridge){sheetSync.bridge.remove();sheetSync.bridge=null}
+  if(sheetSync.pending)sheetSync.pending.clear();sheetSync.bridgeWindow=null;
 }
-function bridgeOpen(url){
- closeBridge();sheetSync.nonce=sheetNonce();
- const src=new URL(url);src.searchParams.set('origin',location.origin);src.searchParams.set('nonce',sheetSync.nonce);
- const frame=document.createElement('iframe');frame.title='Google Sheets 同步橋接器';frame.setAttribute('aria-hidden','true');frame.style.cssText='position:absolute;width:1px;height:1px;border:0;left:-9999px;top:0';
- sheetSync.bridge=frame;
- const promise=new Promise((resolve,reject)=>{
-  const timer=setTimeout(()=>{sheetSync.readyTimer=null;reject(Error('Apps Script 橋接器逾時，請確認網頁應用程式的權限是「任何人」，並嘗試使用 GitHub Pages 網址。'))},22000);
-  sheetSync.readyTimer={resolve:()=>{clearTimeout(timer);sheetSync.readyTimer=null;resolve()},reject:e=>{clearTimeout(timer);sheetSync.readyTimer=null;reject(e)}};
- });
- window.addEventListener('message',handleBridgeMessage);
- document.body.appendChild(frame);frame.src=src.href;
- return promise;
+async function bridgeOpen(){
+ if(!window.crypto?.subtle||!window.crypto?.getRandomValues)throw Error('安全同步需要 HTTPS 與瀏覽器加密功能，請使用正式 GitHub Pages 網址開啟');
+ if(!navigator.onLine)throw Error('目前處於離線狀態；事項仍會儲存在本機');
 }
-function handleBridgeMessage(evt){
- const m=evt.data;if(!m||!['ready','result','error'].includes(m.familySheetBridge)||m.nonce!==sheetSync.nonce)return;
- if(!sheetSync.bridge)return;
- // 驗證 Apps Script/Google 的來源，且只接收對應連線 nonce 的回覆。
- if(!/^https:\/\/(?:[a-z0-9.-]+\.)?googleusercontent\.com$/.test(evt.origin)&&evt.origin!=='https://script.google.com')return;
- if(m.familySheetBridge==='ready'){
-  sheetSync.bridgeWindow=evt.source;sheetSync.bridgeOrigin=evt.origin;
-  if(sheetSync.readyTimer)sheetSync.readyTimer.resolve();return;
- }
- if(evt.source!==sheetSync.bridgeWindow||evt.origin!==sheetSync.bridgeOrigin)return;
- const p=sheetSync.pending.get(m.id);if(!p)return;sheetSync.pending.delete(m.id);clearTimeout(p.timer);
- if(m.familySheetBridge==='error')p.reject(Error(String(m.value||'Apps Script 發生錯誤')));
- else p.resolve(m.value);
+function bytesHex(bytes){return Array.from(bytes,v=>v.toString(16).padStart(2,'0')).join('')}
+async function sha256Hex(input){return bytesHex(new Uint8Array(await crypto.subtle.digest('SHA-256',new TextEncoder().encode(input))))}
+async function signedSheet(action,ts,nonce,content){
+ // 伺服器只保存家庭密鑰的 SHA256 雜湊，簽名雙方均以該雜湊作為 HMAC 金鑰。
+ const derived=await sha256Hex(sheetSync.key);
+ const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(derived),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+ const sig=await crypto.subtle.sign('HMAC',k,new TextEncoder().encode(`${action}\n${ts}\n${nonce}\n${content}`));
+ return bytesHex(new Uint8Array(sig));
 }
-function bridgeCall(action,args={}){
- if(!sheetSync.bridgeWindow) return Promise.reject(Error('尚未建立 Google Apps Script 連線'));
- const id='m'+sheetNonce().slice(0,24);
+async function sheetApiRead(){
+ const ts=String(Date.now()),nonce=sheetNonce(),cb='familySheetCb_'+sheetNonce().slice(0,30);
+ const signature=await signedSheet('read',ts,nonce,cb);
+ const url=new URL(sheetSync.url);
+ for(const [k,v] of Object.entries({transport:'jsonp-v2',action:'read',ts,nonce,callback:cb,signature}))url.searchParams.set(k,v);
  return new Promise((resolve,reject)=>{
-  const timer=setTimeout(()=>{sheetSync.pending.delete(id);reject(Error('Google Sheets 回應逾時；更動已保存在本機，請按「立即同步」重試'))},30000);
-  sheetSync.pending.set(id,{resolve,reject,timer});
-  sheetSync.bridgeWindow.postMessage({familySheetBridge:'rpc',nonce:sheetSync.nonce,id,action,key:sheetSync.key,...args},sheetSync.bridgeOrigin);
+  const script=document.createElement('script');script.async=true;script.referrerPolicy='no-referrer';
+  let completed=false;
+  const cleanup=()=>{clearTimeout(timer);script.remove();delete window[cb]};
+  const finish=(err,result)=>{if(completed)return;completed=true;cleanup();if(err)reject(err);else resolve(result)};
+  const timer=setTimeout(()=>finish(Error('手機未收到 Google Apps Script 回應。請確認 Apps Script 已更新部署為 V1.9.1；也可改用手機 Safari/Chrome 一般分頁重試。')),24000);
+  window[cb]=r=>{if(!r||r.ok!==true)finish(Error(String(r?.error||'Apps Script 未授權此連線')));else finish(null,r)};
+  script.onerror=()=>finish(Error('無法載入 Google Apps Script 回應。請確認網頁應用程式已部署成「任何人」，並檢查手機網路。'));
+  script.src=url.href;document.head.appendChild(script);
  });
+}
+function patchMatchesCloud(snapshot,patch){
+ const data0=snapshot?.data;if(!data0)return false;
+ for(const [key,prop] of [['events','events'],['members','members'],['templates','quickTemplates']]){
+  const list=data0[prop]||[], changes=patch[key];if(!changes)continue;
+  const map=new Map(list.map(r=>[r.id,r]));
+  for(const r of changes.upserts||[])if(!eqJSON(map.get(r.id),r))return false;
+  for(const id of changes.deletes||[])if(map.has(id))return false;
+ }
+ if(Object.prototype.hasOwnProperty.call(patch,'familyName')&&patch.familyName!==data0.familyName)return false;
+ return true;
+}
+function sheetSleep(ms){return new Promise(resolve=>setTimeout(resolve,ms))}
+async function sheetApiWrite({version,patch}){
+ const payload=JSON.stringify({version,patch});
+ const ts=String(Date.now()),nonce=sheetNonce();
+ const signature=await signedSheet('write',ts,nonce,await sha256Hex(payload));
+ const params=new URLSearchParams({transport:'form-v2',action:'write',ts,nonce,signature,payload});
+ // 避免 CORS 預檢：只使用簡單的表單 POST，不讀取 opaque response 的內容。
+ // 真正寫入成功與否，必須從獨立的「已簽署唯讀」請求核對。
+ try{
+  await fetch(sheetSync.url,{method:'POST',mode:'no-cors',redirect:'follow',body:params,cache:'no-store',credentials:'omit'});
+ }catch(e){throw Error('手機無法傳送資料至 Apps Script；資料仍在本機。'+String(e?.message||''))}
+ for(const pause of [500,1000,1700,2800,4200]){
+  await sheetSleep(pause);
+  const remote=await sheetApiRead();
+  if(remote.version===version)continue;
+  if(patchMatchesCloud(remote,patch))return {ok:true,version:remote.version,snapshot:remote};
+  return {ok:false,conflict:true,version:remote.version};
+ }
+ throw Error('尚未確認寫入完成，已保留本機資料。請檢查 Apps Script 部署版本、執行紀錄，再按「立即同步」。');
+}
+async function bridgeCall(action,args={}){
+ if(action==='read')return sheetApiRead();
+ if(action==='write')return sheetApiWrite(args);
+ throw Error('不支援的同步要求');
 }
 function getSavedBase(url){try{const b=JSON.parse(safeStorage.getItem(SHEET_BASE_STORE)||'null');return b&&b.url===url&&Number.isInteger(b.version)?b:null}catch{return null}}
 function rememberBase(data0,version){
@@ -800,7 +829,7 @@ async function sheetPush(){
   const answer=await bridgeCall('write',{version:baseVersion,patch});
   if(answer?.conflict){const latest=await bridgeCall('read');if(rebaseRemote(latest))scheduleSheetPush(120);return;}
   if(!answer?.ok)throw Error('Apps Script 未確認資料寫入完成');
-  rememberBase(submitted,answer.version);sheetSync.blocked=false;sheetSync.lastError='';syncStatus('Sheets 已同步',true);
+  rememberBase(submitted,answer.version);if(answer.snapshot&&answer.snapshot.version>baseVersion+1){if(!rebaseRemote(answer.snapshot))return;}sheetSync.blocked=false;sheetSync.lastError='';syncStatus('Sheets 已同步',true);
   if(hasChanges(deltaData(sheetSync.baseline,data)))scheduleSheetPush(150);
  }catch(err){sheetSync.lastError=String(err?.message||err);syncStatus('⚠ 待同步');toast('未能同步，已保留本機：'+humanError(err));}
  finally{sheetSync.busy=false}
@@ -828,20 +857,21 @@ function cloudModal(){
  const saved=sheetSync.url?sheetSync.url:'';
  const notice=sheetSync.blocked?`<p class="info-note" style="border-left:3px solid #e99f63">⚠️ ${esc(sheetSync.lastError)}。請先下載完整備份，再選擇使用雲端資料或保留本機修改。</p>`:'';
  const html=`<p class="info-note">使用你自己的 <b>Google Sheets＋Apps Script</b> 作為家庭共用資料庫，無須 Firebase。家人在不同裝置輸入同一個部署網址和家庭共用密鑰即可使用。<b>不需把試算表公開分享。</b></p>
- <div class="form-field"><label class="form-label">Apps Script 網頁應用程式網址（/exec）</label><textarea id="sheetUrl" class="field-area" rows="3" spellcheck="false" placeholder="https://script.google.com/macros/s/.../exec">${esc(saved)}</textarea></div>
+ <div class="form-field"><label class="form-label">Apps Script 網頁應用程式網址（/exec，新版需重新部署）</label><textarea id="sheetUrl" class="field-area" rows="3" spellcheck="false" placeholder="https://script.google.com/macros/s/.../exec">${esc(saved)}</textarea></div>
  <div class="form-field" style="margin-top:10px"><label class="form-label">家庭共用密鑰（不是 Google 密碼）</label><input id="sheetSecret" type="password" class="field-input" autocomplete="off" placeholder="請貼上 「家日曆設定」選單產生的 64 碼密鑰" value="${esc(sheetSync.key)}"/></div>
  <div class="btn-row" style="margin-top:12px"><button type="button" class="primary-btn" id="connectSheets">連接並檢查</button><button type="button" class="neutral-btn" id="pullSheets" ${sheetSync.active?'':'disabled'}>立即同步</button></div>
  ${notice}
+ ${sheetSync.lastError&&!sheetSync.active?`<p id="sheetSyncError" class="info-note" style="margin-top:12px;border-left:3px solid #d87664;color:#8c4f43;overflow-wrap:anywhere">連線失敗原因：${esc(sheetSync.lastError)}</p>`:''}
  ${sheetSync.offer?`<hr class="section-divider"/><h3 class="mini-strong">首次連線，請選擇資料來源</h3><p class="cloud-help">試算表目前有 ${sheetSync.offer.data.events.length} 筆事項；本機有 ${data.events.length} 筆。請先下載 JSON 備份，再選擇一項。</p><div class="btn-row"><button type="button" id="useCloud" class="primary-btn">使用試算表的資料</button><button type="button" id="mergeCloud" class="neutral-btn">將本機資料合併上傳</button></div>`:''}
  ${(sheetSync.active||sheetSync.blocked)?`<hr class="section-divider"/><p class="cloud-help"><b>狀態：</b>${sheetSync.blocked?'⚠ 同步衝突':sheetSync.lastError?'⚠ 已保留本機，待重試':'✓ 已連接'}，雲端修訂版 ${sheetSync.version}</p><div class="btn-row"><button type="button" id="copySheetInvite" class="neutral-btn">複製家人連線網址</button><button type="button" id="disconnectSheets" class="neutral-btn">停止共用同步</button></div>`:''}
  ${sheetSync.blocked?`<div class="btn-row"><button type="button" id="conflictUseCloud" class="neutral-btn">放棄本機衝突修改、改用雲端</button><button type="button" id="conflictKeepLocal" class="primary-btn">確認：保留本機修改</button></div>`:''}
- <hr class="section-divider"/><p class="cloud-help"><b>設定流程：</b>Google 試算表 → 擴充功能 → Apps Script → 貼上 ZIP 內的 <code>Code.gs</code> 並建立 HTML 檔 <code>Bridge</code> → 回試算表重新整理 → 「家日曆設定」→「首次初始化」 → 部署網頁應用程式（執行身分：我；存取權：任何人）→ 將 /exec 網址與共用密鑰貼上。<br/>資料變更會在約 1 秒後上傳；開啟頁面時與每分鐘檢查新資料。斷線時先存在此裝置。</p>
+ <hr class="section-divider"/><p class="cloud-help"><b>手機修正：</b>V1.9.1 不使用隱藏 iframe，同步程式必須重新部署最新 Code.gs，保留原 /exec 網址。<br/><b>設定流程：</b>Google 試算表 → 擴充功能 → Apps Script → 貼上 ZIP 內的 <code>Code.gs</code> 並建立 HTML 檔 <code>Bridge</code> → 回試算表重新整理 → 「家日曆設定」→「首次初始化」 → 部署網頁應用程式（執行身分：我；存取權：任何人）→ 將 /exec 網址與共用密鑰貼上。<br/>資料變更會在約 1 秒後上傳；開啟頁面時與每分鐘檢查新資料。斷線時先存在此裝置。</p>
  <p class="cloud-help"><b>安全提醒：</b>家庭密鑰相當於共用密碼，知道它的人就能查看和修改行程。不要放在網址、公開儲存庫或分享畫面；家人移除權限時，請到 Apps Script 用試算表的「家日曆設定 → 更換家庭共用密鑰」更換。</p>`;
  modal('Google Sheets 家人同步','SHEETS + APPS SCRIPT',html);
  $('#connectSheets').onclick=async()=>{
   try{const url=sheetURL($('#sheetUrl').value),key=sheetKey($('#sheetSecret').value);sheetSync.url=url;sheetSync.key=key;
   $('#connectSheets').disabled=true;$('#connectSheets').textContent='連線中…';await sheetConnect();}
-  catch(err){const b=$('#connectSheets');if(b){b.disabled=false;b.textContent='連接並檢查'}}
+  catch(err){const b=$('#connectSheets');if(b){b.disabled=false;b.textContent='連接並檢查'} let el=$('#sheetSyncError');if(!el){el=document.createElement('p');el.id='sheetSyncError';el.className='info-note';el.style='margin-top:12px;border-left:3px solid #d87664;color:#8c4f43;overflow-wrap:anywhere';$('#connectSheets')?.closest('.btn-row')?.after(el)}if(el)el.textContent='連線失敗原因：'+humanError(err)}
  };
  if($('#pullSheets'))$('#pullSheets').onclick=async()=>{await sheetPull();cloudModal();};
  if($('#useCloud'))$('#useCloud').onclick=chooseCloud;
@@ -869,3 +899,4 @@ catch(error) { const box=$('#bootFailure'); if(box){box.classList.remove('hidden
 if(!storageAvailable)toast('瀏覽器限制資料儲存：目前可試用，關閉後可能不會保留，請改用正常瀏覽器開啟。');
 initSheetSync();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
+

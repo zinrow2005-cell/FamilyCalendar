@@ -133,6 +133,9 @@ function apiRead(secret){
 }
 function apiWrite(secret,baseVersion,patch){
  authorizeFamily_(secret);
+ return writeData_(baseVersion,patch);
+}
+function writeData_(baseVersion,patch){
  if(!patch||typeof patch!=='object'||Array.isArray(patch))throw new Error('提交資料不正確');
  const lock=LockService.getScriptLock();lock.waitLock(20000);
  try{
@@ -156,6 +159,7 @@ function apiWrite(secret,baseVersion,patch){
 
 /** 僅提供內嵌的 HtmlService 頁面。避免直接暴露 JSONP 家庭行程。 */
 function doGet(e){
+ if(e && e.parameter && e.parameter.transport==='jsonp-v2')return handleJsonp_(e.parameter);
  const origin=String(e&&e.parameter&&e.parameter.origin||'');
  const nonce=String(e&&e.parameter&&e.parameter.nonce||'');
  if(!/^https:\/\/[a-z0-9.-]+(?::\d{2,5})?$/.test(origin)&&!/^http:\/\/localhost(?::\d{2,5})?$/.test(origin))
@@ -163,4 +167,44 @@ function doGet(e){
  if(!/^[a-zA-Z0-9_-]{20,90}$/.test(nonce))return HtmlService.createHtmlOutput('連線識別碼不正確');
  const page=HtmlService.createTemplateFromFile('Bridge');page.origin=origin;page.nonce=nonce;
  return page.evaluate().setTitle('家日曆 Sheet Sync Bridge').setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+
+/* V1.9.1 無 iframe 手機 API。絕不在 GET 網址中傳送家庭共用密鑰。 */
+function familyHex_(signed){return signed.map(b=>('0'+(b&255).toString(16)).slice(-2)).join('')}
+function familyDigest_(s){return familyHex_(Utilities.computeDigest(Utilities.DigestAlgorithm.SHA_256,String(s),Utilities.Charset.UTF_8))}
+function verifySigned_(params,action,detail){
+ const ts=String(params.ts||''),nonce=String(params.nonce||''),sig=String(params.signature||'');
+ if(!/^\d{13}$/.test(ts)||Math.abs(Date.now()-Number(ts))>5*60*1000)throw new Error('手機時間與伺服器相差過大，請開啟自動日期與時間');
+ if(!/^[a-f0-9]{36}$/.test(nonce)||!/^[a-f0-9]{64}$/.test(sig))throw new Error('驗證參數錯誤');
+ const keyHash=PropertiesService.getScriptProperties().getProperty('FAMILY_KEY_SHA256');
+ if(!keyHash)throw new Error('請在試算表內執行首次初始化');
+ const msg=action+'\n'+ts+'\n'+nonce+'\n'+detail;
+ const expected=familyHex_(Utilities.computeHmacSha256Signature(msg,keyHash,Utilities.Charset.UTF_8));
+ if(expected!==sig)throw new Error('家庭共用密鑰或簽章不正確');
+}
+function handleJsonp_(p){
+ const callback=String(p.callback||'');
+ if(!/^familySheetCb_[a-f0-9]{30}$/.test(callback))return ContentService.createTextOutput('/* Invalid callback */').setMimeType(ContentService.MimeType.JAVASCRIPT);
+ let result;
+ try{
+  if(p.action!=='read')throw new Error('唯讀通道不能執行寫入');
+  verifySigned_(p,'read',callback);
+  const lock=LockService.getScriptLock();lock.waitLock(20000);
+  try{result=fullSnapshot_()}finally{lock.releaseLock()}
+ }catch(error){result={ok:false,error:String(error&&error.message||error)}}
+ return ContentService.createTextOutput(callback+'('+JSON.stringify(result)+');').setMimeType(ContentService.MimeType.JAVASCRIPT);
+}
+function doPost(e){
+ const p=e&&e.parameter||{};
+ let result;
+ try{
+  if(p.transport!=='form-v2'||p.action!=='write')throw new Error('不支援的寫入方式');
+  const payload=String(p.payload||'');
+  if(payload.length>1000000)throw new Error('單次資料超過上傳安全限制');
+  verifySigned_(p,'write',familyDigest_(payload));
+  const body=JSON.parse(payload);
+  result=writeData_(body.version,body.patch);
+ }catch(error){result={ok:false,error:String(error&&error.message||error)}}
+ return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
 }
