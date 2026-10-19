@@ -1,11 +1,11 @@
 <!doctype html>
-<html lang="zh-Hant">
+<html lang="zh-Hant" data-theme="crayon">
 <head>
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
-<meta name="theme-color" content="#fbfbff"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/>
+<meta name="theme-color" content="#fff6e7"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="家日曆"/>
-<title>家日曆 V1.9.1｜我們家的每一天</title>
-<link rel="manifest" href="manifest.webmanifest"/><link rel="icon" href="icons/icon.svg" type="image/svg+xml"/>
+<title>家日曆 V2.2｜蠟筆手繪家庭日曆</title>
+<script>try{document.documentElement.dataset.theme=localStorage.getItem("family_calendar_visual_theme")||"crayon"}catch(e){}</script><link rel="manifest" href="manifest.webmanifest"/><link rel="icon" href="icons/icon.svg" type="image/svg+xml"/>
 <link rel="apple-touch-icon" href="icons/icon-180.png"/>
 
 <style>
@@ -97,28 +97,30 @@
 @media(max-width:480px){.scope-options{grid-template-columns:1fr}.scope-choice{align-items:center}.scope-choice small{margin:0}.scope-choice span{display:flex;gap:10px;flex-wrap:wrap;align-items:center}}
 
 </style>
+<link rel="stylesheet" href="illustrations/crayon-theme.css?v=2.2"/>
 </head>
 <body>
 <div class="app-shell">
   <aside class="sidebar" id="sidebar">
-    <div class="brand"><span class="brand-symbol" aria-hidden="true">✦</span><div><strong>家日曆</strong><small>Our Family Calendar</small></div></div>
+    <div class="brand"><span class="brand-symbol" aria-hidden="true"><img src="illustrations/house.svg" alt=""/></span><div><strong>家日曆</strong><small>Our Family Calendar</small></div></div>
     <div class="side-section-label">家庭空間</div>
-    <div class="family-banner"><div class="family-emoji">🏠</div><div><strong id="familyTitle">我們的家</strong><small id="familySubtitle">把每一天安排得剛剛好</small></div></div>
+    <div class="family-banner"><div class="family-emoji"><img src="illustrations/house.svg" alt=""/></div><div><strong id="familyTitle">我們的家</strong><small id="familySubtitle">把每一天安排得剛剛好</small></div></div>
     <div class="side-section-label side-space">查看誰的行程 <button class="tiny-link" id="selectAllMembers" type="button">全部顯示</button></div>
     <div class="member-filters" id="memberFilters"></div>
-    <button class="side-shift" id="batchShiftSide" type="button">🗓️ 批次排班 · 值班表</button>
-   <button class="side-quick" type="button" id="manageQuick">⚡ 每位家人的常用事項</button>
-    <button class="side-recurring" type="button" id="manageRecurring">↻ 重複事項管理</button>
-<button id="manageMembers" class="outline-button full"><span>⚙</span> 管理家庭成員</button>
-    <div class="side-bottom"><div class="hint-visual"><span>💡</span><p>每個人都有專屬顏色，<br/>同一天也能安排不同事項。</p></div><button id="backupBtn" class="side-link" type="button">⇩ 匯入 / 匯出資料</button></div>
+    <button class="side-shift" id="batchShiftSide" type="button"><img class="menu-crayon-icon" src="illustrations/shift.svg" alt=""/>批次排班 · 值班表</button>
+   <button class="side-quick" type="button" id="manageQuick"><img class="menu-crayon-icon" src="illustrations/bolt.svg" alt=""/>每位家人的常用事項</button>
+    <button class="side-recurring" type="button" id="manageRecurring"><img class="menu-crayon-icon" src="illustrations/repeat.svg" alt=""/>重複事項管理</button>
+<button id="manageMembers" class="outline-button full"><img class="menu-crayon-icon" src="illustrations/people.svg" alt=""/>管理家庭成員</button>
+    <button id="crayonThemeToggle" class="theme-toggle" type="button" aria-label="切換視覺主題"><img src="illustrations/pencil.svg" alt=""/><span id="crayonThemeLabel">蠟筆手繪主題</span><span class="theme-toggle-chevron">⇄</span></button>
+<div class="side-bottom"><div class="hint-visual"><span>💡</span><p>每個人都有專屬顏色，<br/>同一天也能安排不同事項。</p></div><button id="backupBtn" class="side-link" type="button">⇩ 匯入 / 匯出資料</button></div>
   </aside>
   <main class="main-col">
-    <header class="topbar"><div class="header-left"><button type="button" class="icon-button mobile-only" id="menuBtn" aria-label="開啟選單">☰</button><div class="header-heading"><span class="eyebrow">FAMILY MOMENTS</span><h1>我們家的每一天 <span class="hello-emoji">☀️</span><small class="version-tag">V1.9.1</small></h1></div></div><div class="top-actions"><button class="cloud-status" id="cloudBtn" type="button"><span class="status-dot" id="cloudDot"></span><span id="cloudLabel">本機日曆</span><span class="cloud-arrow">↗</span></button><button class="shift-button" id="batchShiftBtn" type="button" title="一次安排多人、多天值班">▦ <span>批次排班</span></button>
+    <header class="topbar"><div class="header-left"><button type="button" class="icon-button mobile-only" id="menuBtn" aria-label="開啟選單">☰</button><div class="header-heading"><span class="eyebrow">FAMILY MOMENTS</span><h1>我們家的每一天 <span class="hello-emoji"><img src="illustrations/sun.svg" alt=""/></span><small class="version-tag">V2.2</small></h1></div></div><div class="top-actions"><button class="cloud-status" id="cloudBtn" type="button"><span class="status-dot" id="cloudDot"></span><span id="cloudLabel">本機日曆</span><span class="cloud-arrow">↗</span></button><button class="shift-button" id="batchShiftBtn" type="button" title="一次安排多人、多天值班">▦ <span>批次排班</span></button>
      <button class="add-button" id="addEventTop" type="button"><span>＋</span><span class="add-label">新增事項</span></button></div></header>
     <div id="bootFailure" class="boot-failure" role="alert"><strong>⚠ 月曆尚未成功啟動</strong><span>請確認瀏覽器允許執行 JavaScript；如果剛更新 PWA，請重新整理一次。下方為備用日期預覽。</span><small class="boot-detail"></small></div>
     <div class="layout-content">
       <section class="calendar-wrap">
-        <div class="welcome-strip"><span class="welcome-icon">🌷</span><p>一家人的大小事，<strong>用顏色就看得懂。</strong></p><span class="welcome-end">Family time, beautiful time.</span></div>
+        <div class="welcome-strip"><span class="welcome-icon"><img src="illustrations/flower.svg" alt=""/></span><p>一家人的大小事，<strong>用顏色就看得懂。</strong></p><span class="welcome-end">Family time, beautiful time.</span></div>
         <div class="calendar-header"><div class="month-title-group"><div class="month-title" id="monthTitle">2026 年 10 月</div><div class="month-subtitle" id="monthSubtitle">October 2026</div></div><div class="calendar-controls"><button id="todayBtn" class="today-btn">今天</button><div class="navigate-group"><button id="prevBtn" title="上一個期間" aria-label="上一個期間">‹</button><button id="nextBtn" title="下一個期間" aria-label="下一個期間">›</button></div><div class="view-switch"><button data-view="month" class="active">月</button><button data-view="week">週</button><button data-view="agenda">清單</button></div></div></div>
         <div id="calendarBody" class="calendar-body"><div class="weekdays"><div class="weekday">週一</div><div class="weekday">週二</div><div class="weekday">週三</div><div class="weekday">週四</div><div class="weekday">週五</div><div class="weekday">週六</div><div class="weekday">週日</div></div><div class="month-grid"><div class="calendar-cell outside" data-day="2026-09-28"><div class="date-row"><span class="date-number">28</span></div></div><div class="calendar-cell outside" data-day="2026-09-29"><div class="date-row"><span class="date-number">29</span></div></div><div class="calendar-cell outside" data-day="2026-09-30"><div class="date-row"><span class="date-number">30</span></div></div><div class="calendar-cell" data-day="2026-10-01"><div class="date-row"><span class="date-number">1</span></div></div><div class="calendar-cell" data-day="2026-10-02"><div class="date-row"><span class="date-number">2</span></div></div><div class="calendar-cell" data-day="2026-10-03"><div class="date-row"><span class="date-number">3</span></div></div><div class="calendar-cell" data-day="2026-10-04"><div class="date-row"><span class="date-number">4</span></div></div><div class="calendar-cell" data-day="2026-10-05"><div class="date-row"><span class="date-number">5</span></div></div><div class="calendar-cell" data-day="2026-10-06"><div class="date-row"><span class="date-number">6</span></div></div><div class="calendar-cell" data-day="2026-10-07"><div class="date-row"><span class="date-number">7</span></div></div><div class="calendar-cell" data-day="2026-10-08"><div class="date-row"><span class="date-number">8</span></div></div><div class="calendar-cell" data-day="2026-10-09"><div class="date-row"><span class="date-number">9</span></div></div><div class="calendar-cell" data-day="2026-10-10"><div class="date-row"><span class="date-number">10</span></div></div><div class="calendar-cell" data-day="2026-10-11"><div class="date-row"><span class="date-number">11</span></div></div><div class="calendar-cell" data-day="2026-10-12"><div class="date-row"><span class="date-number">12</span></div></div><div class="calendar-cell" data-day="2026-10-13"><div class="date-row"><span class="date-number">13</span></div></div><div class="calendar-cell" data-day="2026-10-14"><div class="date-row"><span class="date-number">14</span></div></div><div class="calendar-cell" data-day="2026-10-15"><div class="date-row"><span class="date-number">15</span></div></div><div class="calendar-cell" data-day="2026-10-16"><div class="date-row"><span class="date-number">16</span></div></div><div class="calendar-cell" data-day="2026-10-17"><div class="date-row"><span class="date-number">17</span></div></div><div class="calendar-cell" data-day="2026-10-18"><div class="date-row"><span class="date-number">18</span></div></div><div class="calendar-cell is-today is-selected" data-day="2026-10-19"><div class="date-row"><span class="date-number">19</span></div></div><div class="calendar-cell" data-day="2026-10-20"><div class="date-row"><span class="date-number">20</span></div></div><div class="calendar-cell" data-day="2026-10-21"><div class="date-row"><span class="date-number">21</span></div></div><div class="calendar-cell" data-day="2026-10-22"><div class="date-row"><span class="date-number">22</span></div></div><div class="calendar-cell" data-day="2026-10-23"><div class="date-row"><span class="date-number">23</span></div></div><div class="calendar-cell" data-day="2026-10-24"><div class="date-row"><span class="date-number">24</span></div></div><div class="calendar-cell" data-day="2026-10-25"><div class="date-row"><span class="date-number">25</span></div></div><div class="calendar-cell" data-day="2026-10-26"><div class="date-row"><span class="date-number">26</span></div></div><div class="calendar-cell" data-day="2026-10-27"><div class="date-row"><span class="date-number">27</span></div></div><div class="calendar-cell" data-day="2026-10-28"><div class="date-row"><span class="date-number">28</span></div></div><div class="calendar-cell" data-day="2026-10-29"><div class="date-row"><span class="date-number">29</span></div></div><div class="calendar-cell" data-day="2026-10-30"><div class="date-row"><span class="date-number">30</span></div></div><div class="calendar-cell" data-day="2026-10-31"><div class="date-row"><span class="date-number">31</span></div></div><div class="calendar-cell outside" data-day="2026-11-01"><div class="date-row"><span class="date-number">1</span></div></div></div></div>
         <div class="calendar-footer"><span><span class="today-key"></span> 今天</span><span>點擊日期即可查看或新增事項</span></div>
@@ -127,12 +129,28 @@
     </div>
   </main>
 </div>
+
+<!-- V2.2: 手機常駐快捷導覽，原有桌機操作與事件資料格式維持不變 -->
+<nav class="mobile-bottom-dock" id="mobileBottomDock" aria-label="手機快捷導覽">
+ <button type="button" class="dock-link is-active" id="dockCalendar" aria-label="顯示家庭月曆"><img src="illustrations/house.svg" alt=""/><span>日曆</span></button>
+ <button type="button" class="dock-link" id="dockQuick" aria-haspopup="dialog" aria-label="常用事項快速新增"><img src="illustrations/bolt.svg" alt=""/><span>常用事項</span></button>
+ <button type="button" class="dock-link" id="dockShift" aria-label="開啟批次排班"><img src="illustrations/shift.svg" alt=""/><span>批次排班</span></button>
+ <button type="button" class="dock-link" id="dockFamily" aria-haspopup="dialog" aria-label="依家庭成員篩選"><img src="illustrations/people.svg" alt=""/><span>家人成員</span></button>
+</nav>
+<div id="mobileActionBackdrop" class="mobile-action-backdrop hidden" aria-hidden="true"></div>
+<section id="mobileActionSheet" class="mobile-action-sheet hidden" role="dialog" aria-modal="true" aria-labelledby="mobileActionTitle" tabindex="-1">
+ <div class="mobile-sheet-top"><div class="mobile-sheet-title"><img src="illustrations/flower.svg" alt=""/><div><span>OUR FAMILY · EASY PLAN</span><h2 id="mobileActionTitle">快捷新增</h2></div></div><button type="button" id="mobileSheetClose" class="mobile-sheet-close" aria-label="關閉快捷選單">✕</button></div>
+ <div id="mobileActionContent" class="mobile-sheet-content"></div>
+ <div class="mobile-sheet-garden" aria-hidden="true"></div>
+</section>
+
 <button class="mobile-fab" id="mobileFab" type="button" aria-label="新增事項">＋</button>
 <div class="scrim hidden" id="scrim"></div>
-<div class="modal-backdrop hidden" id="modalBackdrop" role="presentation"><section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><span class="section-eyebrow" id="modalEyebrow">FAMILY CALENDAR</span><h2 id="modalTitle">新增事項</h2></div><button class="close-btn" type="button" id="closeModal" aria-label="關閉">✕</button></div><div id="modalContent" class="modal-content"></div></section></div>
+<div class="modal-backdrop hidden" id="modalBackdrop" role="presentation"><section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><span class="section-eyebrow" id="modalEyebrow">FAMILY CALENDAR</span><h2 id="modalTitle">新增事項</h2><p class="crayon-modal-description" id="crayonModalDescription"></p></div><div class="crayon-modal-art" aria-hidden="true"><img id="crayonModalIcon" src="illustrations/notebook.svg" alt=""/></div><button class="close-btn" type="button" id="closeModal" aria-label="關閉">✕</button></div><div id="modalContent" class="modal-content"></div></section></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <input id="backupFile" type="file" accept="application/json,.json" hidden/><input id="memberPhotoFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" hidden/>
 <script>
+
 
 /* 家日曆 v1.9.0 — Google Sheets + Apps Script 雲端同步 */
 'use strict';
@@ -176,7 +194,10 @@ function safeMemberPhoto(value){
 }
 function avatarHTML(m,klass='member-avatar'){
  const pic=safeMemberPhoto(m.photo);
- return `<span class="${klass} ${pic?'has-photo':''}" style="--member-soft:${rgbSoft(m.color,.15)}">${pic?`<img src="${esc(pic)}" alt="${esc(m.name)}的照片"/>`:esc(m.emoji)}</span>`;
+ const preset=['dad','mom','daughter','son'].includes(m.id);
+ const content=pic?`<img src="${esc(pic)}" alt="${esc(m.name)}的照片"/>`:
+   preset?`<img src="illustrations/portrait-${m.id}.svg" alt="" class="default-crayon-portrait"/>`:esc(m.emoji||'🙂');
+ return `<span class="${klass} ${pic?'has-photo':''}" style="--member-soft:${rgbSoft(m.color,.15)}">${content}</span>`;
 }
 async function compressMemberPhoto(file){
  if(!file||!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type||''))throw Error('請選擇 JPG、PNG、WebP 或 HEIC 照片');
@@ -310,7 +331,7 @@ function renderCalendar(){
  if(view!=='agenda'){
  markup+=`<div class="weekdays">${WEEK.map(w=>`<div class="weekday">週${w}</div>`).join('')}</div><div class="month-grid ${view==='week'?'week-grid':''}">`;
  for(const day of ds){const dt=fromISO(day),items=eventsOn(day),out=view==='month'&&dt.getMonth()!==cursor.getMonth();const colors=[...new Set(items.flatMap(ev=>eventMembers(ev).map(m=>m.color)))].slice(0,4);
- markup+=`<div class="calendar-cell ${out?'outside':''} ${day===today()?'is-today':''} ${day===selectedDate?'is-selected':''}" data-day="${day}" role="button" tabindex="0" aria-label="${esc(dateHeader(day))}，${items.length} 項事項"><div class="date-row"><span class="date-number">${dt.getDate()}</span><span class="date-dot-row">${colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>`;
+ markup+=`<div class="calendar-cell ${out?'outside':''} ${day===today()?'is-today':''} ${day===selectedDate?'is-selected':''} ${items.length?'has-events':'no-events'}" data-day="${day}" role="button" tabindex="0" aria-label="${esc(dateHeader(day))}，${items.length} 項事項"><div class="date-row"><span class="date-number">${dt.getDate()}</span><span class="date-dot-row">${colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>`;
  let limit=view==='week'?10:2;
  for(let i=0;i<Math.min(items.length,limit);i++){const ev=items[i],col=eventColor(ev);markup+=`<button class="event-chip ${ev.done?'done':''}" style="${eventCss(ev)}" data-event="${esc(ev.id)}" data-occurrence="${day}" title="${esc(ev.title)}"><span class="chip-time">${ev.allDay?'':esc(ev.repeat==='none'&&ev.endDate>ev.date&&day>ev.date?(day===ev.endDate?'↳ '+ev.endTime:'持續'):ev.time)}</span><span class="chip-title">${esc(ev.title)}</span></button>`}
  if(items.length>limit)markup+=`<div class="event-more">+${items.length-limit} 更多</div>`;
@@ -341,7 +362,23 @@ function renderSelectedDay(){
 }
 function setSelected(day){selectedDate=day; if(view==='month'&&fromISO(day).getMonth()!==cursor.getMonth())cursor=fromISO(day);if(view==='week')cursor=fromISO(day);render();}
 function go(delta){if(view==='month')cursor=new Date(cursor.getFullYear(),cursor.getMonth()+delta,1);else if(view==='week')cursor=addDays(cursor,delta*7);else cursor=addDays(cursor,delta*30);render()}
-function modal(title,eyebrow,html){$('#modalTitle').textContent=title;$('#modalEyebrow').textContent=eyebrow;$('#modalContent').innerHTML=html;$('#modalBackdrop').classList.remove('hidden');$('#modalContent').scrollTop=0;document.body.style.overflow='hidden';}
+function modal(title,eyebrow,html){
+ $('#modalTitle').textContent=title;$('#modalEyebrow').textContent=eyebrow;$('#modalContent').innerHTML=html;
+ const kinds=[
+  [/批次排班/, 'shift','hospital.svg','把協調好的日期排在一起，每一天都能使用不同時間與底色。'],
+  [/常用事項/,'quick','bolt.svg','先挑家人，再建立一鍵套用的個人事項。'],
+  [/家庭成員/,'members','people.svg','上傳家人照片、設定代表色，讓每個人都有自己的小角落。'],
+  [/重複事項/,'recurring','repeat.svg','固定行程可設定期限，也能只修改某一天。'],
+  [/Sheets|同步/,'cloud','sheets.svg','家庭行程會先保存在本機，再依設定同步到 Google Sheets。'],
+  [/備份|移轉/,'backup','notebook.svg','帶走完整家庭行程，包含照片與常用事項。'],
+  [/事項/,'event','notebook.svg','挑選家人、日期與喜歡的顏色，快速記下今天的大小事。']
+ ];
+ const cfg=kinds.find(x=>x[0].test(title))||[null,'other','flower.svg','一起把每一天的生活安排得剛剛好。'];
+ $('#modal').dataset.kind=cfg[1];
+ const icon=$('#crayonModalIcon'),desc=$('#crayonModalDescription');
+ if(icon)icon.src='illustrations/'+cfg[2];if(desc)desc.textContent=cfg[3];
+ $('#modalBackdrop').classList.remove('hidden');$('#modalContent').scrollTop=0;document.body.style.overflow='hidden';
+}
 function closeModal(){ $('#modalBackdrop').classList.add('hidden');$('#modal').classList.remove('wide-modal');document.body.style.overflow=''; }
 function eventForm(ev=null,occurrence=null){
  const editing=!!ev, recurring=editing&&ev.repeat!=='none';
@@ -741,7 +778,82 @@ async function importBackup(file){
 }
 function humanError(e){const msg=String(e?.message||e||'請稍後再試');if(msg.includes('permission-denied'))return '沒有權限：請確認已將你的 Google Email 加入家庭';if(msg.includes('popup'))return '登入視窗被阻擋，請允許彈出視窗';return msg.slice(0,130)}
 function closeMenu(){$('#sidebar').classList.remove('open');$('#scrim').classList.add('hidden')}
+
+/* V2.2 — 僅 UI 操作捷徑；沿用既有事項、模板、成員、同步資料結構。 */
+let mobileSheetMode='',mobileSheetOwner='';
+function mobileSheetClose(){
+ const panel=$('#mobileActionSheet');if(!panel)return;
+ panel.classList.add('hidden');$('#mobileActionBackdrop').classList.add('hidden');
+ $('#mobileActionBackdrop').setAttribute('aria-hidden','true');
+ if($('#modalBackdrop').classList.contains('hidden'))document.body.style.overflow='';
+ mobileSheetMode='';
+}
+function mobileSheetOpen(mode){
+ if(window.innerWidth>700){if(mode==='quick')quickLibraryModal();else membersForm();return;}
+ closeMenu();mobileSheetMode=mode;
+ $('#mobileActionBackdrop').classList.remove('hidden');$('#mobileActionBackdrop').setAttribute('aria-hidden','false');
+ $('#mobileActionSheet').classList.remove('hidden');
+ document.body.style.overflow='hidden';
+ if(!member(mobileSheetOwner))mobileSheetOwner=data.members[0]?.id||'';
+ mobileSheetPaint();$('#mobileSheetClose').focus();
+}
+function mobileMemberButton(m,chosen){return `<button type="button" class="mobile-owner-chip ${chosen?'chosen':''}" data-mobile-owner="${esc(m.id)}" style="--mobile-owner:${safeColor(m.color)}" aria-pressed="${chosen}">${avatarHTML(m,'mobile-owner-avatar')}<span>${esc(m.name)}</span></button>`}
+function mobileSheetPaint(){
+ const content=$('#mobileActionContent');if(!content)return;
+ const isQuick=mobileSheetMode==='quick';
+ $('#mobileActionTitle').textContent=isQuick?'常用事項・一鍵帶入':'選擇家人的行程';
+ if(isQuick){
+  const chosen=member(mobileSheetOwner),items=(data.quickTemplates||[]).filter(t=>t.memberId===mobileSheetOwner);
+  content.innerHTML=`<div class="mobile-sheet-intro">選日期、選家人、點常用事項，就會帶入原本設定的時間和底色。<strong>儲存前還可以修改。</strong></div>
+   <label class="mobile-sheet-date-label" for="mobileQuickDate">📅 安排在這一天<input id="mobileQuickDate" type="date" value="${esc(selectedDate)}"/></label>
+   <div class="mobile-sheet-small-heading">選擇家庭成員</div><div class="mobile-owner-scroller">${data.members.map(m=>mobileMemberButton(m,m.id===mobileSheetOwner)).join('')}</div>
+   <div class="mobile-sheet-small-heading">${esc(chosen?.name||'家人')}的常用事項</div>
+   <div class="mobile-fast-list">${items.length?items.map(t=>`<button type="button" class="mobile-fast-item" data-mobile-template="${esc(t.id)}" style="--fast-bg:${t.bgColor||rgbSoft(chosen?.color||'#8870ec',.18)};--fast-border:${safeColor(chosen?.color||'#8870ec')}"><span class="mobile-fast-mark">✿</span><span class="mobile-fast-text"><strong>${esc(t.title)}</strong><small>${t.allDay?'全天':esc(t.time+'–'+t.endTime)}${t.location?' · '+esc(t.location):''}</small></span><span aria-hidden="true" class="mobile-fast-chevron">›</span></button>`).join(''):'<div class="mobile-fast-empty"><img src="illustrations/notebook.svg" alt=""/><strong>這位家人還沒有常用事項</strong><span>可以先建立清單，下次就能快速點選。</span></div>'}</div>
+   <div class="mobile-sheet-footer"><button type="button" class="mobile-sheet-secondary" id="mobileEditQuick">⚡ 管理常用清單</button><button type="button" class="mobile-sheet-primary" id="mobileBlankEvent">＋ 自訂新事項</button></div>`;
+  $('#mobileQuickDate').onchange=e=>{if(/^\d{4}-\d\d-\d\d$/.test(e.target.value))setSelected(e.target.value)};
+  $('#mobileEditQuick').onclick=()=>{const owner=mobileSheetOwner;mobileSheetClose();quickLibraryModal(owner)};
+  $('#mobileBlankEvent').onclick=()=>{mobileSheetClose();eventForm()};
+  content.querySelectorAll('[data-mobile-template]').forEach(button=>button.onclick=()=>{
+   const id=button.dataset.mobileTemplate,t=(data.quickTemplates||[]).find(x=>x.id===id);
+   if(!t)return;
+   mobileSheetClose();eventForm();
+   // 在既有表單走原本的模板套用流程，避免出現第二套資料儲存邏輯。
+   const chip=document.querySelector(`#quickPickList [data-quick-id="${CSS.escape(id)}"]`);
+   if(chip){chip.click();return}
+   const ownerBtn=[...document.querySelectorAll('#personOptions [data-person]')].find(x=>x.dataset.person===t.memberId);
+   if(ownerBtn&&!ownerBtn.classList.contains('selected'))ownerBtn.click();
+   const loaded=[...document.querySelectorAll('#quickPickList [data-quick-id]')].find(x=>x.dataset.quickId===id);
+   if(loaded)loaded.click();else toast('找不到快捷事項，請重新開啟常用清單');
+  });
+ }else{
+  content.innerHTML=`<div class="mobile-sheet-intro">只看想看的家人行程；<strong>此處不會刪除行程。</strong></div>
+    <div class="mobile-member-toggles">${data.members.map(m=>`<button type="button" class="mobile-family-filter ${activeMemberIds.has(m.id)?'active':''}" data-mobile-filter="${esc(m.id)}" aria-pressed="${activeMemberIds.has(m.id)}"><span class="mobile-member-avatar">${avatarHTML(m,'mobile-owner-avatar')}</span><span>${esc(m.name)}</span><span class="mobile-family-check">${activeMemberIds.has(m.id)?'✓':'＋'}</span></button>`).join('')}</div>
+    <div class="mobile-sheet-footer"><button type="button" class="mobile-sheet-secondary" id="mobileShowAll">✓ 全部顯示</button><button type="button" class="mobile-sheet-primary" id="mobileManageFamily">✎ 管理家庭成員</button></div>`;
+  $('#mobileShowAll').onclick=()=>{activeMemberIds=new Set(data.members.map(m=>m.id));render();mobileSheetPaint()};
+  $('#mobileManageFamily').onclick=()=>{mobileSheetClose();membersForm()};
+  content.querySelectorAll('[data-mobile-filter]').forEach(b=>b.onclick=()=>{
+   const id=b.dataset.mobileFilter;
+   if(activeMemberIds.has(id))activeMemberIds.delete(id);else activeMemberIds.add(id);
+   render();mobileSheetPaint();
+  });
+ }
+ if(isQuick)content.querySelectorAll('[data-mobile-owner]').forEach(b=>b.onclick=()=>{
+  mobileSheetOwner=b.dataset.mobileOwner;mobileSheetPaint();
+ });
+}
+function wireMobileDock(){
+ const btn=id=>document.getElementById(id);
+ btn('dockCalendar').onclick=()=>{mobileSheetClose();view='month';cursor=fromISO(selectedDate);render();window.scrollTo({top:0,behavior:'smooth'})};
+ btn('dockQuick').onclick=()=>mobileSheetOpen('quick');
+ btn('dockShift').onclick=()=>{mobileSheetClose();batchShiftForm()};
+ btn('dockFamily').onclick=()=>mobileSheetOpen('family');
+ btn('mobileSheetClose').onclick=mobileSheetClose;
+ btn('mobileActionBackdrop').onclick=mobileSheetClose;
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mobileSheetMode)mobileSheetClose()});
+}
+
 function wireEvents(){
+ wireMobileDock();
  $('#addEventTop').onclick=()=>eventForm();$('#addEventDay').onclick=()=>eventForm();$('#mobileFab').onclick=()=>eventForm();$('#batchShiftBtn').onclick=()=>batchShiftForm();$('#batchShiftSide').onclick=()=>{closeMenu();batchShiftForm()};
  $('#manageRecurring').onclick=()=>{closeMenu();recurringManager()};$('#manageMembers').onclick=()=>{closeMenu();membersForm()};$('#manageQuick').onclick=()=>{closeMenu();quickLibraryModal()};$('#backupBtn').onclick=()=>{closeMenu();backupModal()};$('#cloudBtn').onclick=cloudModal;
  $('#menuBtn').onclick=()=>{$('#sidebar').classList.add('open');$('#scrim').classList.remove('hidden')};$('#scrim').onclick=closeMenu;
@@ -1033,6 +1145,14 @@ catch(error) { const box=$('#bootFailure'); if(box){box.classList.remove('hidden
 if(!storageAvailable)toast('瀏覽器限制資料儲存：目前可試用，關閉後可能不會保留，請改用正常瀏覽器開啟。');
 initSheetSync();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
-
+</script>
+<script id="crayonThemeLogic">
+(function(){
+ const el=document.getElementById('crayonThemeToggle');
+ const label=document.getElementById('crayonThemeLabel');
+ function apply(){if(label)label.textContent=document.documentElement.dataset.theme==='classic'?'切換成蠟筆主題':'蠟筆手繪主題';if(el)el.setAttribute('aria-pressed',document.documentElement.dataset.theme==='crayon'?'true':'false');}
+ if(el)el.addEventListener('click',function(){let next=document.documentElement.dataset.theme==='crayon'?'classic':'crayon';document.documentElement.dataset.theme=next;try{localStorage.setItem('family_calendar_visual_theme',next)}catch(e){}apply()});
+ apply();
+})();
 </script>
 </body></html>

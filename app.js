@@ -42,7 +42,10 @@ function safeMemberPhoto(value){
 }
 function avatarHTML(m,klass='member-avatar'){
  const pic=safeMemberPhoto(m.photo);
- return `<span class="${klass} ${pic?'has-photo':''}" style="--member-soft:${rgbSoft(m.color,.15)}">${pic?`<img src="${esc(pic)}" alt="${esc(m.name)}的照片"/>`:esc(m.emoji)}</span>`;
+ const preset=['dad','mom','daughter','son'].includes(m.id);
+ const content=pic?`<img src="${esc(pic)}" alt="${esc(m.name)}的照片"/>`:
+   preset?`<img src="illustrations/portrait-${m.id}.svg" alt="" class="default-crayon-portrait"/>`:esc(m.emoji||'🙂');
+ return `<span class="${klass} ${pic?'has-photo':''}" style="--member-soft:${rgbSoft(m.color,.15)}">${content}</span>`;
 }
 async function compressMemberPhoto(file){
  if(!file||!/^image\/(jpeg|png|webp|heic|heif)$/.test(file.type||''))throw Error('請選擇 JPG、PNG、WebP 或 HEIC 照片');
@@ -176,7 +179,7 @@ function renderCalendar(){
  if(view!=='agenda'){
  markup+=`<div class="weekdays">${WEEK.map(w=>`<div class="weekday">週${w}</div>`).join('')}</div><div class="month-grid ${view==='week'?'week-grid':''}">`;
  for(const day of ds){const dt=fromISO(day),items=eventsOn(day),out=view==='month'&&dt.getMonth()!==cursor.getMonth();const colors=[...new Set(items.flatMap(ev=>eventMembers(ev).map(m=>m.color)))].slice(0,4);
- markup+=`<div class="calendar-cell ${out?'outside':''} ${day===today()?'is-today':''} ${day===selectedDate?'is-selected':''}" data-day="${day}" role="button" tabindex="0" aria-label="${esc(dateHeader(day))}，${items.length} 項事項"><div class="date-row"><span class="date-number">${dt.getDate()}</span><span class="date-dot-row">${colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>`;
+ markup+=`<div class="calendar-cell ${out?'outside':''} ${day===today()?'is-today':''} ${day===selectedDate?'is-selected':''} ${items.length?'has-events':'no-events'}" data-day="${day}" role="button" tabindex="0" aria-label="${esc(dateHeader(day))}，${items.length} 項事項"><div class="date-row"><span class="date-number">${dt.getDate()}</span><span class="date-dot-row">${colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>`;
  let limit=view==='week'?10:2;
  for(let i=0;i<Math.min(items.length,limit);i++){const ev=items[i],col=eventColor(ev);markup+=`<button class="event-chip ${ev.done?'done':''}" style="${eventCss(ev)}" data-event="${esc(ev.id)}" data-occurrence="${day}" title="${esc(ev.title)}"><span class="chip-time">${ev.allDay?'':esc(ev.repeat==='none'&&ev.endDate>ev.date&&day>ev.date?(day===ev.endDate?'↳ '+ev.endTime:'持續'):ev.time)}</span><span class="chip-title">${esc(ev.title)}</span></button>`}
  if(items.length>limit)markup+=`<div class="event-more">+${items.length-limit} 更多</div>`;
@@ -207,7 +210,23 @@ function renderSelectedDay(){
 }
 function setSelected(day){selectedDate=day; if(view==='month'&&fromISO(day).getMonth()!==cursor.getMonth())cursor=fromISO(day);if(view==='week')cursor=fromISO(day);render();}
 function go(delta){if(view==='month')cursor=new Date(cursor.getFullYear(),cursor.getMonth()+delta,1);else if(view==='week')cursor=addDays(cursor,delta*7);else cursor=addDays(cursor,delta*30);render()}
-function modal(title,eyebrow,html){$('#modalTitle').textContent=title;$('#modalEyebrow').textContent=eyebrow;$('#modalContent').innerHTML=html;$('#modalBackdrop').classList.remove('hidden');$('#modalContent').scrollTop=0;document.body.style.overflow='hidden';}
+function modal(title,eyebrow,html){
+ $('#modalTitle').textContent=title;$('#modalEyebrow').textContent=eyebrow;$('#modalContent').innerHTML=html;
+ const kinds=[
+  [/批次排班/, 'shift','hospital.svg','把協調好的日期排在一起，每一天都能使用不同時間與底色。'],
+  [/常用事項/,'quick','bolt.svg','先挑家人，再建立一鍵套用的個人事項。'],
+  [/家庭成員/,'members','people.svg','上傳家人照片、設定代表色，讓每個人都有自己的小角落。'],
+  [/重複事項/,'recurring','repeat.svg','固定行程可設定期限，也能只修改某一天。'],
+  [/Sheets|同步/,'cloud','sheets.svg','家庭行程會先保存在本機，再依設定同步到 Google Sheets。'],
+  [/備份|移轉/,'backup','notebook.svg','帶走完整家庭行程，包含照片與常用事項。'],
+  [/事項/,'event','notebook.svg','挑選家人、日期與喜歡的顏色，快速記下今天的大小事。']
+ ];
+ const cfg=kinds.find(x=>x[0].test(title))||[null,'other','flower.svg','一起把每一天的生活安排得剛剛好。'];
+ $('#modal').dataset.kind=cfg[1];
+ const icon=$('#crayonModalIcon'),desc=$('#crayonModalDescription');
+ if(icon)icon.src='illustrations/'+cfg[2];if(desc)desc.textContent=cfg[3];
+ $('#modalBackdrop').classList.remove('hidden');$('#modalContent').scrollTop=0;document.body.style.overflow='hidden';
+}
 function closeModal(){ $('#modalBackdrop').classList.add('hidden');$('#modal').classList.remove('wide-modal');document.body.style.overflow=''; }
 function eventForm(ev=null,occurrence=null){
  const editing=!!ev, recurring=editing&&ev.repeat!=='none';
@@ -607,7 +626,82 @@ async function importBackup(file){
 }
 function humanError(e){const msg=String(e?.message||e||'請稍後再試');if(msg.includes('permission-denied'))return '沒有權限：請確認已將你的 Google Email 加入家庭';if(msg.includes('popup'))return '登入視窗被阻擋，請允許彈出視窗';return msg.slice(0,130)}
 function closeMenu(){$('#sidebar').classList.remove('open');$('#scrim').classList.add('hidden')}
+
+/* V2.2 — 僅 UI 操作捷徑；沿用既有事項、模板、成員、同步資料結構。 */
+let mobileSheetMode='',mobileSheetOwner='';
+function mobileSheetClose(){
+ const panel=$('#mobileActionSheet');if(!panel)return;
+ panel.classList.add('hidden');$('#mobileActionBackdrop').classList.add('hidden');
+ $('#mobileActionBackdrop').setAttribute('aria-hidden','true');
+ if($('#modalBackdrop').classList.contains('hidden'))document.body.style.overflow='';
+ mobileSheetMode='';
+}
+function mobileSheetOpen(mode){
+ if(window.innerWidth>700){if(mode==='quick')quickLibraryModal();else membersForm();return;}
+ closeMenu();mobileSheetMode=mode;
+ $('#mobileActionBackdrop').classList.remove('hidden');$('#mobileActionBackdrop').setAttribute('aria-hidden','false');
+ $('#mobileActionSheet').classList.remove('hidden');
+ document.body.style.overflow='hidden';
+ if(!member(mobileSheetOwner))mobileSheetOwner=data.members[0]?.id||'';
+ mobileSheetPaint();$('#mobileSheetClose').focus();
+}
+function mobileMemberButton(m,chosen){return `<button type="button" class="mobile-owner-chip ${chosen?'chosen':''}" data-mobile-owner="${esc(m.id)}" style="--mobile-owner:${safeColor(m.color)}" aria-pressed="${chosen}">${avatarHTML(m,'mobile-owner-avatar')}<span>${esc(m.name)}</span></button>`}
+function mobileSheetPaint(){
+ const content=$('#mobileActionContent');if(!content)return;
+ const isQuick=mobileSheetMode==='quick';
+ $('#mobileActionTitle').textContent=isQuick?'常用事項・一鍵帶入':'選擇家人的行程';
+ if(isQuick){
+  const chosen=member(mobileSheetOwner),items=(data.quickTemplates||[]).filter(t=>t.memberId===mobileSheetOwner);
+  content.innerHTML=`<div class="mobile-sheet-intro">選日期、選家人、點常用事項，就會帶入原本設定的時間和底色。<strong>儲存前還可以修改。</strong></div>
+   <label class="mobile-sheet-date-label" for="mobileQuickDate">📅 安排在這一天<input id="mobileQuickDate" type="date" value="${esc(selectedDate)}"/></label>
+   <div class="mobile-sheet-small-heading">選擇家庭成員</div><div class="mobile-owner-scroller">${data.members.map(m=>mobileMemberButton(m,m.id===mobileSheetOwner)).join('')}</div>
+   <div class="mobile-sheet-small-heading">${esc(chosen?.name||'家人')}的常用事項</div>
+   <div class="mobile-fast-list">${items.length?items.map(t=>`<button type="button" class="mobile-fast-item" data-mobile-template="${esc(t.id)}" style="--fast-bg:${t.bgColor||rgbSoft(chosen?.color||'#8870ec',.18)};--fast-border:${safeColor(chosen?.color||'#8870ec')}"><span class="mobile-fast-mark">✿</span><span class="mobile-fast-text"><strong>${esc(t.title)}</strong><small>${t.allDay?'全天':esc(t.time+'–'+t.endTime)}${t.location?' · '+esc(t.location):''}</small></span><span aria-hidden="true" class="mobile-fast-chevron">›</span></button>`).join(''):'<div class="mobile-fast-empty"><img src="illustrations/notebook.svg" alt=""/><strong>這位家人還沒有常用事項</strong><span>可以先建立清單，下次就能快速點選。</span></div>'}</div>
+   <div class="mobile-sheet-footer"><button type="button" class="mobile-sheet-secondary" id="mobileEditQuick">⚡ 管理常用清單</button><button type="button" class="mobile-sheet-primary" id="mobileBlankEvent">＋ 自訂新事項</button></div>`;
+  $('#mobileQuickDate').onchange=e=>{if(/^\d{4}-\d\d-\d\d$/.test(e.target.value))setSelected(e.target.value)};
+  $('#mobileEditQuick').onclick=()=>{const owner=mobileSheetOwner;mobileSheetClose();quickLibraryModal(owner)};
+  $('#mobileBlankEvent').onclick=()=>{mobileSheetClose();eventForm()};
+  content.querySelectorAll('[data-mobile-template]').forEach(button=>button.onclick=()=>{
+   const id=button.dataset.mobileTemplate,t=(data.quickTemplates||[]).find(x=>x.id===id);
+   if(!t)return;
+   mobileSheetClose();eventForm();
+   // 在既有表單走原本的模板套用流程，避免出現第二套資料儲存邏輯。
+   const chip=document.querySelector(`#quickPickList [data-quick-id="${CSS.escape(id)}"]`);
+   if(chip){chip.click();return}
+   const ownerBtn=[...document.querySelectorAll('#personOptions [data-person]')].find(x=>x.dataset.person===t.memberId);
+   if(ownerBtn&&!ownerBtn.classList.contains('selected'))ownerBtn.click();
+   const loaded=[...document.querySelectorAll('#quickPickList [data-quick-id]')].find(x=>x.dataset.quickId===id);
+   if(loaded)loaded.click();else toast('找不到快捷事項，請重新開啟常用清單');
+  });
+ }else{
+  content.innerHTML=`<div class="mobile-sheet-intro">只看想看的家人行程；<strong>此處不會刪除行程。</strong></div>
+    <div class="mobile-member-toggles">${data.members.map(m=>`<button type="button" class="mobile-family-filter ${activeMemberIds.has(m.id)?'active':''}" data-mobile-filter="${esc(m.id)}" aria-pressed="${activeMemberIds.has(m.id)}"><span class="mobile-member-avatar">${avatarHTML(m,'mobile-owner-avatar')}</span><span>${esc(m.name)}</span><span class="mobile-family-check">${activeMemberIds.has(m.id)?'✓':'＋'}</span></button>`).join('')}</div>
+    <div class="mobile-sheet-footer"><button type="button" class="mobile-sheet-secondary" id="mobileShowAll">✓ 全部顯示</button><button type="button" class="mobile-sheet-primary" id="mobileManageFamily">✎ 管理家庭成員</button></div>`;
+  $('#mobileShowAll').onclick=()=>{activeMemberIds=new Set(data.members.map(m=>m.id));render();mobileSheetPaint()};
+  $('#mobileManageFamily').onclick=()=>{mobileSheetClose();membersForm()};
+  content.querySelectorAll('[data-mobile-filter]').forEach(b=>b.onclick=()=>{
+   const id=b.dataset.mobileFilter;
+   if(activeMemberIds.has(id))activeMemberIds.delete(id);else activeMemberIds.add(id);
+   render();mobileSheetPaint();
+  });
+ }
+ if(isQuick)content.querySelectorAll('[data-mobile-owner]').forEach(b=>b.onclick=()=>{
+  mobileSheetOwner=b.dataset.mobileOwner;mobileSheetPaint();
+ });
+}
+function wireMobileDock(){
+ const btn=id=>document.getElementById(id);
+ btn('dockCalendar').onclick=()=>{mobileSheetClose();view='month';cursor=fromISO(selectedDate);render();window.scrollTo({top:0,behavior:'smooth'})};
+ btn('dockQuick').onclick=()=>mobileSheetOpen('quick');
+ btn('dockShift').onclick=()=>{mobileSheetClose();batchShiftForm()};
+ btn('dockFamily').onclick=()=>mobileSheetOpen('family');
+ btn('mobileSheetClose').onclick=mobileSheetClose;
+ btn('mobileActionBackdrop').onclick=mobileSheetClose;
+ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&mobileSheetMode)mobileSheetClose()});
+}
+
 function wireEvents(){
+ wireMobileDock();
  $('#addEventTop').onclick=()=>eventForm();$('#addEventDay').onclick=()=>eventForm();$('#mobileFab').onclick=()=>eventForm();$('#batchShiftBtn').onclick=()=>batchShiftForm();$('#batchShiftSide').onclick=()=>{closeMenu();batchShiftForm()};
  $('#manageRecurring').onclick=()=>{closeMenu();recurringManager()};$('#manageMembers').onclick=()=>{closeMenu();membersForm()};$('#manageQuick').onclick=()=>{closeMenu();quickLibraryModal()};$('#backupBtn').onclick=()=>{closeMenu();backupModal()};$('#cloudBtn').onclick=cloudModal;
  $('#menuBtn').onclick=()=>{$('#sidebar').classList.add('open');$('#scrim').classList.remove('hidden')};$('#scrim').onclick=closeMenu;

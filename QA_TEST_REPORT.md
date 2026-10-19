@@ -1,7 +1,27 @@
-# V1.9.1 同步修正測試摘要
+# 家日曆 V2.2 — 操作測試報告
 
-- `node --check`：前端內嵌 JS、獨立 app.js 與 Apps Script Code.gs 複製為 JS 後語法檢查均通過。
-- 本機 Node VM + Google Apps Script 函式模擬：HMAC-SHA256 簽章驗證、JSONP 簽名讀取、表單 POST 簽名寫入、寫後查詢版號與資料、舊版本衝突與錯誤密鑰拒絕 — 通過。
-- 原有 V1.9 回歸測試（模擬伺服器）：初次雲端載入、新增與修改、非重疊衝突合併、同筆衝突處理、本機資料保留、頭像、重複期限、大量資料分批等 11 項 — 通過。
-- Chromium 模擬：1440px 電腦、820px 平板、390px 手機、360px 手機，月曆和同步表單可正常顯示且沒有 JavaScript pageerror；失敗原因能顯示於設定視窗 — 通過。
-- 限制：測試用模擬 Google Apps Script 後端。尚未以使用者的實際 Apps Script `/exec`、iPhone Safari、Android Chrome 真正完成跨裝置同步測試；不能保證所有行動網路或瀏覽器環境都能正常連線。
+測試環境：Linux Chromium (Playwright)，2026-10-19。測試以嵌入式 HTML + SVG 資產方式執行，模擬 1440×900 桌機、820×1024 平板、390×844 手機、360×740 小手機，不等同於 iPhone / iPad Safari 或真正 Google Sheets 雙機同步測試。
+
+**70 / 70 項通過**：
+- desktop（1440×900）：12/12 通過，JavaScript 未捕獲錯誤 0 項。
+- tablet（820×1024）：12/12 通過，JavaScript 未捕獲錯誤 0 項。
+- phone（390×844）：23/23 通過，JavaScript 未捕獲錯誤 0 項。
+- small_phone（360×740）：23/23 通過，JavaScript 未捕獲錯誤 0 項。
+
+## 核對重點
+- 手機底部四入口可點，且手機月曆無水平溢位。
+- 開啟快捷選單，依成員顯示專屬常用事項；選定日期再一鍵帶入既有新增事項表單。
+- 經既有表單提交後，日期、標題、開始時間和資料儲存正確；不會未確認就新增。
+- 家庭成員切換顯示／全部顯示有效，不會刪除既有行程。
+- 批次排班入口可直接進入原本不規則排班功能。
+- 桌機、平板原有新增事項、排班、常用事項管理入口仍能打開。
+- 手機新增事項的儲存列為 sticky，長表單較容易送出。
+- 原 AppsScript/Code.gs 與 Bridge.html 檔案 SHA256 與 V2.1 完全一致；本版未改動雲端 API 或資料格式。
+
+## 尚未實測
+- 真實 GitHub Pages 發布更新、Service Worker 快取更新後的裝置現場行為。
+- iOS Safari / Android Chrome 原生日期挑選器、長期離線再連線。
+- 真正使用者 Google Sheets／Apps Script 跨裝置同步及多人同時寫入。
+
+## 測試資料
+自動化測試用的「媽媽晚間值班」只存在測試頁記憶體，不包含在正式發行版預設資料裡。詳情可查 `QA_RESULTS_V2.2.json`。

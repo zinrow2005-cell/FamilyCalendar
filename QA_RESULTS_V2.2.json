@@ -1,0 +1,322 @@
+[
+  {
+    "device": "desktop",
+    "size": [
+      1440,
+      900
+    ],
+    "checks": [
+      [
+        "load",
+        "PASS"
+      ],
+      [
+        "month grid",
+        "PASS"
+      ],
+      [
+        "no boot failure",
+        "PASS"
+      ],
+      [
+        "mobile dock visibility",
+        "PASS"
+      ],
+      [
+        "desktop standard add",
+        "PASS"
+      ],
+      [
+        "desktop close",
+        "PASS"
+      ],
+      [
+        "desktop shift",
+        "PASS"
+      ],
+      [
+        "desktop shift close",
+        "PASS"
+      ],
+      [
+        "desktop quick management",
+        "PASS"
+      ],
+      [
+        "desktop quick close",
+        "PASS"
+      ],
+      [
+        "screenshot",
+        "PASS"
+      ],
+      [
+        "no uncaught errors",
+        "PASS"
+      ]
+    ],
+    "page_errors": []
+  },
+  {
+    "device": "tablet",
+    "size": [
+      820,
+      1024
+    ],
+    "checks": [
+      [
+        "load",
+        "PASS"
+      ],
+      [
+        "month grid",
+        "PASS"
+      ],
+      [
+        "no boot failure",
+        "PASS"
+      ],
+      [
+        "mobile dock visibility",
+        "PASS"
+      ],
+      [
+        "desktop standard add",
+        "PASS"
+      ],
+      [
+        "desktop close",
+        "PASS"
+      ],
+      [
+        "desktop shift",
+        "PASS"
+      ],
+      [
+        "desktop shift close",
+        "PASS"
+      ],
+      [
+        "desktop quick management",
+        "PASS"
+      ],
+      [
+        "desktop quick close",
+        "PASS"
+      ],
+      [
+        "screenshot",
+        "PASS"
+      ],
+      [
+        "no uncaught errors",
+        "PASS"
+      ]
+    ],
+    "page_errors": []
+  },
+  {
+    "device": "phone",
+    "size": [
+      390,
+      844
+    ],
+    "checks": [
+      [
+        "load",
+        "PASS"
+      ],
+      [
+        "month grid",
+        "PASS"
+      ],
+      [
+        "no boot failure",
+        "PASS"
+      ],
+      [
+        "mobile dock visibility",
+        "PASS"
+      ],
+      [
+        "no horizontal overflow",
+        "PASS"
+      ],
+      [
+        "mobile dock screenshot",
+        "PASS"
+      ],
+      [
+        "open quick sheet",
+        "PASS"
+      ],
+      [
+        "family chips visible",
+        "PASS"
+      ],
+      [
+        "quick empty state",
+        "PASS"
+      ],
+      [
+        "switch owner and show templates",
+        "PASS"
+      ],
+      [
+        "quick sheet screenshot",
+        "PASS"
+      ],
+      [
+        "fast template -> event -> saved",
+        "PASS"
+      ],
+      [
+        "family filter and show all",
+        "PASS"
+      ],
+      [
+        "family sheet screenshot",
+        "PASS"
+      ],
+      [
+        "close family sheet",
+        "PASS"
+      ],
+      [
+        "shift direct open",
+        "PASS"
+      ],
+      [
+        "shift screenshot",
+        "PASS"
+      ],
+      [
+        "shift close",
+        "PASS"
+      ],
+      [
+        "dock month return",
+        "PASS"
+      ],
+      [
+        "mobile fab event",
+        "PASS"
+      ],
+      [
+        "mobile form sticky actions",
+        "PASS"
+      ],
+      [
+        "close event",
+        "PASS"
+      ],
+      [
+        "no uncaught errors",
+        "PASS"
+      ]
+    ],
+    "page_errors": []
+  },
+  {
+    "device": "small_phone",
+    "size": [
+      360,
+      740
+    ],
+    "checks": [
+      [
+        "load",
+        "PASS"
+      ],
+      [
+        "month grid",
+        "PASS"
+      ],
+      [
+        "no boot failure",
+        "PASS"
+      ],
+      [
+        "mobile dock visibility",
+        "PASS"
+      ],
+      [
+        "no horizontal overflow",
+        "PASS"
+      ],
+      [
+        "mobile dock screenshot",
+        "PASS"
+      ],
+      [
+        "open quick sheet",
+        "PASS"
+      ],
+      [
+        "family chips visible",
+        "PASS"
+      ],
+      [
+        "quick empty state",
+        "PASS"
+      ],
+      [
+        "switch owner and show templates",
+        "PASS"
+      ],
+      [
+        "quick sheet screenshot",
+        "PASS"
+      ],
+      [
+        "fast template -> event -> saved",
+        "PASS"
+      ],
+      [
+        "family filter and show all",
+        "PASS"
+      ],
+      [
+        "family sheet screenshot",
+        "PASS"
+      ],
+      [
+        "close family sheet",
+        "PASS"
+      ],
+      [
+        "shift direct open",
+        "PASS"
+      ],
+      [
+        "shift screenshot",
+        "PASS"
+      ],
+      [
+        "shift close",
+        "PASS"
+      ],
+      [
+        "dock month return",
+        "PASS"
+      ],
+      [
+        "mobile fab event",
+        "PASS"
+      ],
+      [
+        "mobile form sticky actions",
+        "PASS"
+      ],
+      [
+        "close event",
+        "PASS"
+      ],
+      [
+        "no uncaught errors",
+        "PASS"
+      ]
+    ],
+    "page_errors": []
+  }
+]
