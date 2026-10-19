@@ -1,0 +1,52 @@
+/* 國定假日的顏色與家人行程顏色獨立；蠟筆主題與經典主題共用。 */
+.calendar-cell.has-holiday:not(.is-today) .date-number{color:#b85f59}
+.calendar-cell.holiday-work:not(.is-today) .date-number{color:#786f86}
+.calendar-cell .holiday-label{
+  display:flex;align-items:center;gap:3px;max-width:100%;min-width:0;
+  border-radius:6px;padding:3px 3px;margin:2px 0 3px;
+  background:#fff1e9;color:#a95852;
+  border:1px solid #f6d9ca;font-weight:800;font-size:9px;line-height:1.25;
+  text-align:left;cursor:default;position:relative;z-index:1
+}
+.calendar-cell .holiday-label>span:first-child{
+  width:13px;height:13px;flex:0 0 13px;border-radius:4px;background:#eab3a0;
+  color:#763e36;display:grid;place-items:center;font-size:9px
+}
+.calendar-cell .holiday-label>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.calendar-cell .holiday-label.holiday-substitute{background:#fff2dd;color:#9f7043;border-color:#f7e3bd}
+.calendar-cell .holiday-label.holiday-substitute>span:first-child{background:#f7d79f;color:#855e33}
+.calendar-cell .holiday-label.holiday-work{background:#eeedf0;color:#6b6374;border-color:#dcd8e1}
+.calendar-cell .holiday-label.holiday-work>span:first-child{background:#c7bfce;color:#51475d}
+.agenda-holiday,.selected-holiday{
+  display:flex;align-items:center;gap:10px;border:1px solid #f4d7c6;
+  background:#fff4ed;color:#a5564c;border-radius:12px;padding:10px 12px;margin:8px 0;
+  font-size:12px;font-weight:750
+}
+.agenda-holiday>span,.selected-holiday>span{
+  flex:0 0 25px;width:25px;height:25px;display:grid;place-items:center;border-radius:8px;
+  background:#f2c4b1;color:#824b42;font-weight:800
+}
+.agenda-holiday.holiday-substitute,.selected-holiday.holiday-substitute{background:#fff8e9;color:#986a40;border-color:#f4e0b8}
+.agenda-holiday.holiday-substitute>span,.selected-holiday.holiday-substitute>span{background:#f5ddb1;color:#785634}
+.agenda-holiday.holiday-work,.selected-holiday.holiday-work{background:#f5f2f6;color:#675c73;border-color:#e3dce6}
+.agenda-holiday.holiday-work>span,.selected-holiday.holiday-work>span{background:#dcd3df;color:#51465b}
+.selected-holiday{margin-top:14px;margin-bottom:5px}
+.selected-holiday[hidden]{display:none!important}
+.selected-holiday div{min-width:0}
+.selected-holiday strong{display:block;line-height:1.5;overflow-wrap:anywhere}
+.selected-holiday small{display:block;color:#948682;font-size:10px;font-weight:500;margin-top:3px;line-height:1.5}
+.calendar-footer-controls{display:flex;align-items:center;flex-wrap:wrap;gap:14px}
+.holiday-toggle{display:inline-flex;align-items:center;gap:5px;color:#a56f65;font-weight:800;white-space:nowrap;cursor:pointer}
+.holiday-toggle input{accent-color:#d58b7e;width:15px;height:15px;margin:0;cursor:pointer}
+.holiday-source-link{color:inherit;text-decoration:underline;text-decoration-color:#d6c5bf;text-underline-offset:2px}
+.holiday-source-link:hover{color:#ae6b5c}
+.holiday-data-status{font-size:10px;color:#aa8e80;display:inline-block;margin-left:8px}
+@media(max-width:700px){
+  .calendar-cell .holiday-label{padding:2px 1px;gap:2px;margin:1px 0 2px;font-size:8px;border-radius:4px}
+  .calendar-cell .holiday-label>span:first-child{width:10px;height:11px;flex-basis:10px;font-size:8px;border-radius:3px}
+  .calendar-footer{gap:5px;flex-wrap:wrap}
+  .calendar-footer-controls{gap:8px}
+  .holiday-toggle{font-size:10px}
+  .selected-holiday{margin:10px 0 3px}
+}
+@media(max-width:375px){.calendar-cell .holiday-label{font-size:7px}.calendar-cell .holiday-label>span:first-child{width:9px;flex-basis:9px}}

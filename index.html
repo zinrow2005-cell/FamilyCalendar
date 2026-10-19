@@ -4,7 +4,7 @@
 <meta charset="utf-8"/><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
 <meta name="theme-color" content="#fff6e7"/><meta name="apple-mobile-web-app-capable" content="yes"/><meta name="apple-mobile-web-app-status-bar-style" content="default"/>
 <meta name="apple-mobile-web-app-title" content="家日曆"/>
-<title>家日曆 V2.3｜蠟筆手繪家庭日曆</title>
+<title>家日曆 V2.4｜蠟筆手繪家庭日曆</title>
 <script>try{document.documentElement.dataset.theme=localStorage.getItem("family_calendar_visual_theme")||"crayon"}catch(e){}</script><link rel="manifest" href="manifest.webmanifest"/><link rel="icon" href="icons/icon.svg" type="image/svg+xml"/>
 <link rel="apple-touch-icon" href="icons/icon-180.png"/>
 
@@ -97,9 +97,9 @@
 @media(max-width:480px){.scope-options{grid-template-columns:1fr}.scope-choice{align-items:center}.scope-choice small{margin:0}.scope-choice span{display:flex;gap:10px;flex-wrap:wrap;align-items:center}}
 
 </style>
-<link rel="stylesheet" href="illustrations/crayon-theme.css?v=2.3"/>
+<link rel="stylesheet" href="illustrations/crayon-theme.css?v=2.4"/>
 <style>
-/* V2.3 同步衝突對照：手機、雲端各一欄，窄手機上下排列。 */
+/* V2.4 同步衝突對照：手機、雲端各一欄，窄手機上下排列。 */
 .sync-conflict-panel{margin:13px 0;padding:14px;border:1px solid #eac7ab;border-radius:16px;background:#fff9f0}
 .sync-conflict-panel h3{margin:0 0 7px;color:#775643;font-size:15px}
 .sync-conflict-item{border:1px solid #eee1d3;background:white;border-radius:13px;padding:13px;margin:11px 0}
@@ -131,7 +131,7 @@
 <div class="side-bottom"><div class="hint-visual"><span>💡</span><p>每個人都有專屬顏色，<br/>同一天也能安排不同事項。</p></div><button id="backupBtn" class="side-link" type="button">⇩ 匯入 / 匯出資料</button></div>
   </aside>
   <main class="main-col">
-    <header class="topbar"><div class="header-left"><button type="button" class="icon-button mobile-only" id="menuBtn" aria-label="開啟選單">☰</button><div class="header-heading"><span class="eyebrow">FAMILY MOMENTS</span><h1>我們家的每一天 <span class="hello-emoji"><img src="illustrations/sun.svg" alt=""/></span><small class="version-tag">V2.3</small></h1></div></div><div class="top-actions"><button class="cloud-status" id="cloudBtn" type="button"><span class="status-dot" id="cloudDot"></span><span id="cloudLabel">本機日曆</span><span class="cloud-arrow">↗</span></button><button class="shift-button" id="batchShiftBtn" type="button" title="一次安排多人、多天值班">▦ <span>批次排班</span></button>
+    <header class="topbar"><div class="header-left"><button type="button" class="icon-button mobile-only" id="menuBtn" aria-label="開啟選單">☰</button><div class="header-heading"><span class="eyebrow">FAMILY MOMENTS</span><h1>我們家的每一天 <span class="hello-emoji"><img src="illustrations/sun.svg" alt=""/></span><small class="version-tag">V2.4</small></h1></div></div><div class="top-actions"><button class="cloud-status" id="cloudBtn" type="button"><span class="status-dot" id="cloudDot"></span><span id="cloudLabel">本機日曆</span><span class="cloud-arrow">↗</span></button><button class="shift-button" id="batchShiftBtn" type="button" title="一次安排多人、多天值班">▦ <span>批次排班</span></button>
      <button class="add-button" id="addEventTop" type="button"><span>＋</span><span class="add-label">新增事項</span></button></div></header>
     <div id="bootFailure" class="boot-failure" role="alert"><strong>⚠ 月曆尚未成功啟動</strong><span>請確認瀏覽器允許執行 JavaScript；如果剛更新 PWA，請重新整理一次。下方為備用日期預覽。</span><small class="boot-detail"></small></div>
     <div class="layout-content">
@@ -139,9 +139,10 @@
         <div class="welcome-strip"><span class="welcome-icon"><img src="illustrations/flower.svg" alt=""/></span><p>一家人的大小事，<strong>用顏色就看得懂。</strong></p><span class="welcome-end">Family time, beautiful time.</span></div>
         <div class="calendar-header"><div class="month-title-group"><div class="month-title" id="monthTitle">2026 年 10 月</div><div class="month-subtitle" id="monthSubtitle">October 2026</div></div><div class="calendar-controls"><button id="todayBtn" class="today-btn">今天</button><div class="navigate-group"><button id="prevBtn" title="上一個期間" aria-label="上一個期間">‹</button><button id="nextBtn" title="下一個期間" aria-label="下一個期間">›</button></div><div class="view-switch"><button data-view="month" class="active">月</button><button data-view="week">週</button><button data-view="agenda">清單</button></div></div></div>
         <div id="calendarBody" class="calendar-body"><div class="weekdays"><div class="weekday">週一</div><div class="weekday">週二</div><div class="weekday">週三</div><div class="weekday">週四</div><div class="weekday">週五</div><div class="weekday">週六</div><div class="weekday">週日</div></div><div class="month-grid"><div class="calendar-cell outside" data-day="2026-09-28"><div class="date-row"><span class="date-number">28</span></div></div><div class="calendar-cell outside" data-day="2026-09-29"><div class="date-row"><span class="date-number">29</span></div></div><div class="calendar-cell outside" data-day="2026-09-30"><div class="date-row"><span class="date-number">30</span></div></div><div class="calendar-cell" data-day="2026-10-01"><div class="date-row"><span class="date-number">1</span></div></div><div class="calendar-cell" data-day="2026-10-02"><div class="date-row"><span class="date-number">2</span></div></div><div class="calendar-cell" data-day="2026-10-03"><div class="date-row"><span class="date-number">3</span></div></div><div class="calendar-cell" data-day="2026-10-04"><div class="date-row"><span class="date-number">4</span></div></div><div class="calendar-cell" data-day="2026-10-05"><div class="date-row"><span class="date-number">5</span></div></div><div class="calendar-cell" data-day="2026-10-06"><div class="date-row"><span class="date-number">6</span></div></div><div class="calendar-cell" data-day="2026-10-07"><div class="date-row"><span class="date-number">7</span></div></div><div class="calendar-cell" data-day="2026-10-08"><div class="date-row"><span class="date-number">8</span></div></div><div class="calendar-cell" data-day="2026-10-09"><div class="date-row"><span class="date-number">9</span></div></div><div class="calendar-cell" data-day="2026-10-10"><div class="date-row"><span class="date-number">10</span></div></div><div class="calendar-cell" data-day="2026-10-11"><div class="date-row"><span class="date-number">11</span></div></div><div class="calendar-cell" data-day="2026-10-12"><div class="date-row"><span class="date-number">12</span></div></div><div class="calendar-cell" data-day="2026-10-13"><div class="date-row"><span class="date-number">13</span></div></div><div class="calendar-cell" data-day="2026-10-14"><div class="date-row"><span class="date-number">14</span></div></div><div class="calendar-cell" data-day="2026-10-15"><div class="date-row"><span class="date-number">15</span></div></div><div class="calendar-cell" data-day="2026-10-16"><div class="date-row"><span class="date-number">16</span></div></div><div class="calendar-cell" data-day="2026-10-17"><div class="date-row"><span class="date-number">17</span></div></div><div class="calendar-cell" data-day="2026-10-18"><div class="date-row"><span class="date-number">18</span></div></div><div class="calendar-cell is-today is-selected" data-day="2026-10-19"><div class="date-row"><span class="date-number">19</span></div></div><div class="calendar-cell" data-day="2026-10-20"><div class="date-row"><span class="date-number">20</span></div></div><div class="calendar-cell" data-day="2026-10-21"><div class="date-row"><span class="date-number">21</span></div></div><div class="calendar-cell" data-day="2026-10-22"><div class="date-row"><span class="date-number">22</span></div></div><div class="calendar-cell" data-day="2026-10-23"><div class="date-row"><span class="date-number">23</span></div></div><div class="calendar-cell" data-day="2026-10-24"><div class="date-row"><span class="date-number">24</span></div></div><div class="calendar-cell" data-day="2026-10-25"><div class="date-row"><span class="date-number">25</span></div></div><div class="calendar-cell" data-day="2026-10-26"><div class="date-row"><span class="date-number">26</span></div></div><div class="calendar-cell" data-day="2026-10-27"><div class="date-row"><span class="date-number">27</span></div></div><div class="calendar-cell" data-day="2026-10-28"><div class="date-row"><span class="date-number">28</span></div></div><div class="calendar-cell" data-day="2026-10-29"><div class="date-row"><span class="date-number">29</span></div></div><div class="calendar-cell" data-day="2026-10-30"><div class="date-row"><span class="date-number">30</span></div></div><div class="calendar-cell" data-day="2026-10-31"><div class="date-row"><span class="date-number">31</span></div></div><div class="calendar-cell outside" data-day="2026-11-01"><div class="date-row"><span class="date-number">1</span></div></div></div></div>
-        <div class="calendar-footer"><span><span class="today-key"></span> 今天</span><span>點擊日期即可查看或新增事項</span></div>
+        <div class="calendar-footer"><span class="calendar-footer-controls"><span><span class="today-key"></span> 今天</span><label class="holiday-toggle"><input id="holidayToggle" type="checkbox" checked/><span>🇹🇼 顯示國定假日</span></label><span id="holidayDataStatus" class="holiday-data-status"></span></span><span><a href="https://data.gov.tw/dataset/14718" target="_blank" rel="noopener noreferrer" class="holiday-source-link" title="國定假日資料來源">人事行政總處資料</a> · 點擊日期可查看或新增事項</span></div>
       </section>
-      <aside class="details-panel"><div class="panel-heading"><div><span class="section-eyebrow">YOUR DAY</span><h2 id="selectedDateTitle">今天</h2><p id="selectedDateSubtitle" class="dim">把這天的大小事記下來</p></div><div id="dayBigNumber" class="day-big-number">19</div></div><div class="day-members" id="dayMemberDots"></div><div id="dayEventList" class="day-event-list"></div><button id="addEventDay" class="day-add-btn" type="button">＋ 為這一天新增事項</button><div class="upcoming-wrap"><div class="upcoming-head"><h3>接下來的行程</h3><span>未來 14 天</span></div><div id="upcomingList" class="upcoming-list"></div></div></aside>
+      <aside class="details-panel"><div class="panel-heading"><div><span class="section-eyebrow">YOUR DAY</span><h2 id="selectedDateTitle">今天</h2><p id="selectedDateSubtitle" class="dim">把這天的大小事記下來</p></div><div id="dayBigNumber" class="day-big-number">19</div></div><div class="day-members" id="dayMemberDots"></div>
+<div id="selectedHoliday" class="selected-holiday" hidden></div><div id="dayEventList" class="day-event-list"></div><button id="addEventDay" class="day-add-btn" type="button">＋ 為這一天新增事項</button><div class="upcoming-wrap"><div class="upcoming-head"><h3>接下來的行程</h3><span>未來 14 天</span></div><div id="upcomingList" class="upcoming-list"></div></div></aside>
     </div>
   </main>
 </div>
@@ -165,12 +166,11 @@
 <div class="modal-backdrop hidden" id="modalBackdrop" role="presentation"><section class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><div><span class="section-eyebrow" id="modalEyebrow">FAMILY CALENDAR</span><h2 id="modalTitle">新增事項</h2><p class="crayon-modal-description" id="crayonModalDescription"></p></div><div class="crayon-modal-art" aria-hidden="true"><img id="crayonModalIcon" src="illustrations/notebook.svg" alt=""/></div><button class="close-btn" type="button" id="closeModal" aria-label="關閉">✕</button></div><div id="modalContent" class="modal-content"></div></section></div>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <input id="backupFile" type="file" accept="application/json,.json" hidden/><input id="memberPhotoFile" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif" hidden/>
+<link rel="stylesheet" href="./holidays.css?v=2.4"/>
+<script src="./holidays.js?v=2.4"></script>
 <script>
 
-
-
-
-/* 家日曆 V2.3 — 家庭全自動同步（Google Sheets + Apps Script） */
+/* 家日曆 V2.4 — 家庭全自動同步 + 臺灣國定假日（Google Sheets + Apps Script） */
 'use strict';
 // localStorage 在限制環境中可能被瀏覽器拒絕，確保核心功能仍可操作。
 const storageAvailable=(()=>{try{const k='__familycalendar_storage_test__';localStorage.setItem(k,'1');localStorage.removeItem(k);return true}catch{return false}})();
@@ -300,6 +300,9 @@ let selectedDate=today(),cursor=new Date(),view='month';
 let activeMemberIds=new Set(data.members.map(m=>m.id));
 
 let visibleCalendarItems=[];
+const HOLIDAYS=(typeof window!=='undefined'&&window.TaiwanHolidays)||{get(){return null},ensureRange(){},subscribe(){},isVisible(){return false},setVisible(){},state(){return 'unavailable'}};
+HOLIDAYS.subscribe(()=>{if(document.querySelector('#calendarBody')){renderCalendar();renderSelectedDay()}});
+
 let toastTimer;
 function persist(){localData=data;try{safeStorage.setItem(STORE,JSON.stringify(localData))}catch{toast('儲存空間不足，請先匯出資料備份')}scheduleSheetPush();}
 function message(text){toast(text)}
@@ -338,9 +341,14 @@ function renderMembers(){
  $('#memberFilters').innerHTML=data.members.map(m=>`<div class="member-filter-entry"><button class="member-filter ${activeMemberIds.has(m.id)?'active':''}" data-filter="${esc(m.id)}" style="--member-soft:${rgbSoft(m.color,.15)}">${avatarHTML(m)}<span class="member-name">${esc(m.name)}</span><span class="member-check">${activeMemberIds.has(m.id)?'✓':''}</span></button><button type="button" class="member-photo-upload" data-upload-member="${esc(m.id)}" title="上傳${esc(m.name)}的照片" aria-label="上傳${esc(m.name)}的照片">📷</button></div>`).join('');
 }
 function rangeForView(){const dt=new Date(cursor.getFullYear(),cursor.getMonth(),cursor.getDate());if(view==='month'){const first=new Date(dt.getFullYear(),dt.getMonth(),1);const before=(first.getDay()+6)%7;const last=new Date(dt.getFullYear(),dt.getMonth()+1,0);const needed=Math.ceil((before+last.getDate())/7)*7;return {start:addDays(first,-before),end:addDays(first,needed-before-1)}}if(view==='week'){let before=(dt.getDay()+6)%7;return {start:addDays(dt,-before),end:addDays(dt,6-before)}}return {start:dt,end:addDays(dt,29)};}
+function holidayShortName(name){if(name.includes('臺灣光復暨'))return '光復節';if(name.includes('孔子誕辰'))return '教師節';if(name==='開國紀念日')return '元旦';if(name==='農曆除夕')return '除夕';if(name==='兒童節及民族掃墓節')return '兒童／清明';return name;}
 function renderCalendar(){
  const month=$('#monthTitle'),sub=$('#monthSubtitle');
  const range=rangeForView();
+ HOLIDAYS.ensureRange(range.start,range.end);
+ const hstatus=HOLIDAYS.state(cursor.getFullYear());
+ const hcaption=$('#holidayDataStatus');
+ if(hcaption)hcaption.textContent=!HOLIDAYS.isVisible()?'':hstatus==='loading'?'假日資料取得中…':hstatus==='unavailable'?'本年度假日資料尚未取得':hstatus==='offline'?'2026 年內建假日（連線後更新）':'';
  if(view==='month'){month.textContent=`${cursor.getFullYear()} 年 ${cursor.getMonth()+1} 月`;sub.textContent=`${MONTH_EN[cursor.getMonth()]} ${cursor.getFullYear()}`}
  else if(view==='week'){month.textContent=`${dateInfo(iso(range.start))} – ${dateInfo(iso(range.end))}`;sub.textContent=`${range.start.getFullYear()} 年・每週從星期一開始`}
  else{month.textContent=`${cursor.getFullYear()} 年 ${cursor.getMonth()+1} 月`;sub.textContent='未來 30 天的行程'}
@@ -348,8 +356,8 @@ function renderCalendar(){
  let markup=''; const ds=daysBetween(range.start,range.end);visibleCalendarItems=ds;
  if(view!=='agenda'){
  markup+=`<div class="weekdays">${WEEK.map(w=>`<div class="weekday">週${w}</div>`).join('')}</div><div class="month-grid ${view==='week'?'week-grid':''}">`;
- for(const day of ds){const dt=fromISO(day),items=eventsOn(day),out=view==='month'&&dt.getMonth()!==cursor.getMonth();const colors=[...new Set(items.flatMap(ev=>eventMembers(ev).map(m=>m.color)))].slice(0,4);
- markup+=`<div class="calendar-cell ${out?'outside':''} ${day===today()?'is-today':''} ${day===selectedDate?'is-selected':''} ${items.length?'has-events':'no-events'}" data-day="${day}" role="button" tabindex="0" aria-label="${esc(dateHeader(day))}，${items.length} 項事項"><div class="date-row"><span class="date-number">${dt.getDate()}</span><span class="date-dot-row">${colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>`;
+ for(const day of ds){const dt=fromISO(day),items=eventsOn(day),holiday=HOLIDAYS.get(day),out=view==='month'&&dt.getMonth()!==cursor.getMonth();const colors=[...new Set(items.flatMap(ev=>eventMembers(ev).map(m=>m.color)))].slice(0,4);
+ markup+=`<div class="calendar-cell ${out?'outside':''} ${day===today()?'is-today':''} ${day===selectedDate?'is-selected':''} ${items.length?'has-events':'no-events'} ${holiday?'has-holiday holiday-'+holiday.kind:''}" data-day="${day}" role="button" tabindex="0" aria-label="${esc(dateHeader(day))}${holiday?'，'+esc(holiday.name):''}，${items.length} 項家庭事項"><div class="date-row"><span class="date-number">${dt.getDate()}</span><span class="date-dot-row">${colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>${holiday?`<div class="holiday-label holiday-${holiday.kind}" title="${esc(holiday.name)}"><span aria-hidden="true">${holiday.kind==='work'?'班':'休'}</span><span>${esc(holidayShortName(holiday.name))}</span></div>`:''}`;
  let limit=view==='week'?10:2;
  for(let i=0;i<Math.min(items.length,limit);i++){const ev=items[i],col=eventColor(ev);markup+=`<button class="event-chip ${ev.done?'done':''}" style="${eventCss(ev)}" data-event="${esc(ev.id)}" data-occurrence="${day}" title="${esc(ev.title)}"><span class="chip-time">${ev.allDay?'':esc(ev.repeat==='none'&&ev.endDate>ev.date&&day>ev.date?(day===ev.endDate?'↳ '+ev.endTime:'持續'):ev.time)}</span><span class="chip-title">${esc(ev.title)}</span></button>`}
  if(items.length>limit)markup+=`<div class="event-more">+${items.length-limit} 更多</div>`;
@@ -357,8 +365,8 @@ function renderCalendar(){
  markup+='</div>';
  }else{
  markup+='<div class="agenda-list">';let count=0;
- for(const day of ds){const events=eventsOn(day);if(!events.length)continue;count++;
- markup+=`<div class="agenda-date-group"><div class="agenda-date-label">${esc(dateHeader(day))} ${day===today()?'・今天':''}</div>`;
+ for(const day of ds){const events=eventsOn(day),holiday=HOLIDAYS.get(day);if(!events.length&&!holiday)continue;count++;
+ markup+=`<div class="agenda-date-group"><div class="agenda-date-label">${esc(dateHeader(day))} ${day===today()?'・今天':''}</div>${holiday?`<div class="agenda-holiday holiday-${holiday.kind}"><span>${holiday.kind==='work'?'班':'休'}</span> 🇹🇼 ${esc(holiday.name)}</div>`:''}`;
  for(const ev of events){const col=eventColor(ev);markup+=`<div class="agenda-event" data-event="${esc(ev.id)}" data-occurrence="${day}" style="${eventCss(ev)}"><span class="agenda-icon">${esc(eventMembers(ev)[0]?.emoji||'🏡')}</span><span class="agenda-copy"><strong>${esc(ev.title)}</strong><small>${esc(timeLabel(ev,day))}　${esc(eventMembers(ev).map(m=>m.name).join('、')||'全家')}</small></span><span style="color:#aaa5ba">›</span></div>`;}
  markup+='</div>';
  }if(!count)markup+='<div class="agenda-empty"><span>📅</span>這段期間還沒有安排事項<br/>點選「新增事項」開始記錄吧！</div>';
@@ -367,9 +375,10 @@ function renderCalendar(){
  $('#calendarBody').innerHTML=markup;
 }
 function renderSelectedDay(){
- const dt=fromISO(selectedDate),events=eventsOn(selectedDate);
+ const dt=fromISO(selectedDate),events=eventsOn(selectedDate),holiday=HOLIDAYS.get(selectedDate);
  $('#selectedDateTitle').textContent=`${dt.getMonth()+1} 月 ${dt.getDate()} 日 · 週${dayWeek(selectedDate)}`;
  $('#selectedDateSubtitle').textContent=selectedDate===today()?'今天也一起把日子過得精彩':'這一天的家庭安排';
+ const hb=$('#selectedHoliday');if(hb){hb.hidden=!holiday;hb.className='selected-holiday'+(holiday?' holiday-'+holiday.kind:'');hb.innerHTML=holiday?`<span aria-hidden="true">${holiday.kind==='work'?'班':'休'}</span><div><strong>🇹🇼 ${esc(holiday.name)}</strong><small>臺灣政府辦公日曆參考・不影響家人排班</small></div>`:'';}
  $('#dayBigNumber').textContent=dt.getDate();
  const mIds=[...new Set(events.flatMap(e=>e.memberIds))];
  $('#dayMemberDots').innerHTML=mIds.map(id=>member(id)).filter(Boolean).map(m=>`<span class="pill-dot" style="background:${m.color}" title="${esc(m.name)}"></span>`).join('')+`<span class="day-total">${events.length} 項事項</span>`;
@@ -1263,6 +1272,14 @@ if(!storageAvailable)toast('瀏覽器限制資料儲存：目前可試用，關�
 initSheetSync();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
+
+
+// 國定假日只在本機決定顯示方式，不變更家庭雲端資料。
+const holidayToggleElement=document.getElementById('holidayToggle');
+if(holidayToggleElement){
+ holidayToggleElement.checked=HOLIDAYS.isVisible();
+ holidayToggleElement.addEventListener('change',()=>HOLIDAYS.setVisible(holidayToggleElement.checked));
+}
 
 </script>
 <script id="crayonThemeLogic">

@@ -1,6 +1,6 @@
 
 
-/* 家日曆 V2.3 — 家庭全自動同步（Google Sheets + Apps Script） */
+/* 家日曆 V2.4 — 家庭全自動同步 + 臺灣國定假日（Google Sheets + Apps Script） */
 'use strict';
 // localStorage 在限制環境中可能被瀏覽器拒絕，確保核心功能仍可操作。
 const storageAvailable=(()=>{try{const k='__familycalendar_storage_test__';localStorage.setItem(k,'1');localStorage.removeItem(k);return true}catch{return false}})();
@@ -130,6 +130,9 @@ let selectedDate=today(),cursor=new Date(),view='month';
 let activeMemberIds=new Set(data.members.map(m=>m.id));
 
 let visibleCalendarItems=[];
+const HOLIDAYS=(typeof window!=='undefined'&&window.TaiwanHolidays)||{get(){return null},ensureRange(){},subscribe(){},isVisible(){return false},setVisible(){},state(){return 'unavailable'}};
+HOLIDAYS.subscribe(()=>{if(document.querySelector('#calendarBody')){renderCalendar();renderSelectedDay()}});
+
 let toastTimer;
 function persist(){localData=data;try{safeStorage.setItem(STORE,JSON.stringify(localData))}catch{toast('儲存空間不足，請先匯出資料備份')}scheduleSheetPush();}
 function message(text){toast(text)}
@@ -168,9 +171,14 @@ function renderMembers(){
  $('#memberFilters').innerHTML=data.members.map(m=>`<div class="member-filter-entry"><button class="member-filter ${activeMemberIds.has(m.id)?'active':''}" data-filter="${esc(m.id)}" style="--member-soft:${rgbSoft(m.color,.15)}">${avatarHTML(m)}<span class="member-name">${esc(m.name)}</span><span class="member-check">${activeMemberIds.has(m.id)?'✓':''}</span></button><button type="button" class="member-photo-upload" data-upload-member="${esc(m.id)}" title="上傳${esc(m.name)}的照片" aria-label="上傳${esc(m.name)}的照片">📷</button></div>`).join('');
 }
 function rangeForView(){const dt=new Date(cursor.getFullYear(),cursor.getMonth(),cursor.getDate());if(view==='month'){const first=new Date(dt.getFullYear(),dt.getMonth(),1);const before=(first.getDay()+6)%7;const last=new Date(dt.getFullYear(),dt.getMonth()+1,0);const needed=Math.ceil((before+last.getDate())/7)*7;return {start:addDays(first,-before),end:addDays(first,needed-before-1)}}if(view==='week'){let before=(dt.getDay()+6)%7;return {start:addDays(dt,-before),end:addDays(dt,6-before)}}return {start:dt,end:addDays(dt,29)};}
+function holidayShortName(name){if(name.includes('臺灣光復暨'))return '光復節';if(name.includes('孔子誕辰'))return '教師節';if(name==='開國紀念日')return '元旦';if(name==='農曆除夕')return '除夕';if(name==='兒童節及民族掃墓節')return '兒童／清明';return name;}
 function renderCalendar(){
  const month=$('#monthTitle'),sub=$('#monthSubtitle');
  const range=rangeForView();
+ HOLIDAYS.ensureRange(range.start,range.end);
+ const hstatus=HOLIDAYS.state(cursor.getFullYear());
+ const hcaption=$('#holidayDataStatus');
+ if(hcaption)hcaption.textContent=!HOLIDAYS.isVisible()?'':hstatus==='loading'?'假日資料取得中…':hstatus==='unavailable'?'本年度假日資料尚未取得':hstatus==='offline'?'2026 年內建假日（連線後更新）':'';
  if(view==='month'){month.textContent=`${cursor.getFullYear()} 年 ${cursor.getMonth()+1} 月`;sub.textContent=`${MONTH_EN[cursor.getMonth()]} ${cursor.getFullYear()}`}
  else if(view==='week'){month.textContent=`${dateInfo(iso(range.start))} – ${dateInfo(iso(range.end))}`;sub.textContent=`${range.start.getFullYear()} 年・每週從星期一開始`}
  else{month.textContent=`${cursor.getFullYear()} 年 ${cursor.getMonth()+1} 月`;sub.textContent='未來 30 天的行程'}
@@ -178,8 +186,8 @@ function renderCalendar(){
  let markup=''; const ds=daysBetween(range.start,range.end);visibleCalendarItems=ds;
  if(view!=='agenda'){
  markup+=`<div class="weekdays">${WEEK.map(w=>`<div class="weekday">週${w}</div>`).join('')}</div><div class="month-grid ${view==='week'?'week-grid':''}">`;
- for(const day of ds){const dt=fromISO(day),items=eventsOn(day),out=view==='month'&&dt.getMonth()!==cursor.getMonth();const colors=[...new Set(items.flatMap(ev=>eventMembers(ev).map(m=>m.color)))].slice(0,4);
- markup+=`<div class="calendar-cell ${out?'outside':''} ${day===today()?'is-today':''} ${day===selectedDate?'is-selected':''} ${items.length?'has-events':'no-events'}" data-day="${day}" role="button" tabindex="0" aria-label="${esc(dateHeader(day))}，${items.length} 項事項"><div class="date-row"><span class="date-number">${dt.getDate()}</span><span class="date-dot-row">${colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>`;
+ for(const day of ds){const dt=fromISO(day),items=eventsOn(day),holiday=HOLIDAYS.get(day),out=view==='month'&&dt.getMonth()!==cursor.getMonth();const colors=[...new Set(items.flatMap(ev=>eventMembers(ev).map(m=>m.color)))].slice(0,4);
+ markup+=`<div class="calendar-cell ${out?'outside':''} ${day===today()?'is-today':''} ${day===selectedDate?'is-selected':''} ${items.length?'has-events':'no-events'} ${holiday?'has-holiday holiday-'+holiday.kind:''}" data-day="${day}" role="button" tabindex="0" aria-label="${esc(dateHeader(day))}${holiday?'，'+esc(holiday.name):''}，${items.length} 項家庭事項"><div class="date-row"><span class="date-number">${dt.getDate()}</span><span class="date-dot-row">${colors.map(c=>`<i style="background:${c}"></i>`).join('')}</span></div>${holiday?`<div class="holiday-label holiday-${holiday.kind}" title="${esc(holiday.name)}"><span aria-hidden="true">${holiday.kind==='work'?'班':'休'}</span><span>${esc(holidayShortName(holiday.name))}</span></div>`:''}`;
  let limit=view==='week'?10:2;
  for(let i=0;i<Math.min(items.length,limit);i++){const ev=items[i],col=eventColor(ev);markup+=`<button class="event-chip ${ev.done?'done':''}" style="${eventCss(ev)}" data-event="${esc(ev.id)}" data-occurrence="${day}" title="${esc(ev.title)}"><span class="chip-time">${ev.allDay?'':esc(ev.repeat==='none'&&ev.endDate>ev.date&&day>ev.date?(day===ev.endDate?'↳ '+ev.endTime:'持續'):ev.time)}</span><span class="chip-title">${esc(ev.title)}</span></button>`}
  if(items.length>limit)markup+=`<div class="event-more">+${items.length-limit} 更多</div>`;
@@ -187,8 +195,8 @@ function renderCalendar(){
  markup+='</div>';
  }else{
  markup+='<div class="agenda-list">';let count=0;
- for(const day of ds){const events=eventsOn(day);if(!events.length)continue;count++;
- markup+=`<div class="agenda-date-group"><div class="agenda-date-label">${esc(dateHeader(day))} ${day===today()?'・今天':''}</div>`;
+ for(const day of ds){const events=eventsOn(day),holiday=HOLIDAYS.get(day);if(!events.length&&!holiday)continue;count++;
+ markup+=`<div class="agenda-date-group"><div class="agenda-date-label">${esc(dateHeader(day))} ${day===today()?'・今天':''}</div>${holiday?`<div class="agenda-holiday holiday-${holiday.kind}"><span>${holiday.kind==='work'?'班':'休'}</span> 🇹🇼 ${esc(holiday.name)}</div>`:''}`;
  for(const ev of events){const col=eventColor(ev);markup+=`<div class="agenda-event" data-event="${esc(ev.id)}" data-occurrence="${day}" style="${eventCss(ev)}"><span class="agenda-icon">${esc(eventMembers(ev)[0]?.emoji||'🏡')}</span><span class="agenda-copy"><strong>${esc(ev.title)}</strong><small>${esc(timeLabel(ev,day))}　${esc(eventMembers(ev).map(m=>m.name).join('、')||'全家')}</small></span><span style="color:#aaa5ba">›</span></div>`;}
  markup+='</div>';
  }if(!count)markup+='<div class="agenda-empty"><span>📅</span>這段期間還沒有安排事項<br/>點選「新增事項」開始記錄吧！</div>';
@@ -197,9 +205,10 @@ function renderCalendar(){
  $('#calendarBody').innerHTML=markup;
 }
 function renderSelectedDay(){
- const dt=fromISO(selectedDate),events=eventsOn(selectedDate);
+ const dt=fromISO(selectedDate),events=eventsOn(selectedDate),holiday=HOLIDAYS.get(selectedDate);
  $('#selectedDateTitle').textContent=`${dt.getMonth()+1} 月 ${dt.getDate()} 日 · 週${dayWeek(selectedDate)}`;
  $('#selectedDateSubtitle').textContent=selectedDate===today()?'今天也一起把日子過得精彩':'這一天的家庭安排';
+ const hb=$('#selectedHoliday');if(hb){hb.hidden=!holiday;hb.className='selected-holiday'+(holiday?' holiday-'+holiday.kind:'');hb.innerHTML=holiday?`<span aria-hidden="true">${holiday.kind==='work'?'班':'休'}</span><div><strong>🇹🇼 ${esc(holiday.name)}</strong><small>臺灣政府辦公日曆參考・不影響家人排班</small></div>`:'';}
  $('#dayBigNumber').textContent=dt.getDate();
  const mIds=[...new Set(events.flatMap(e=>e.memberIds))];
  $('#dayMemberDots').innerHTML=mIds.map(id=>member(id)).filter(Boolean).map(m=>`<span class="pill-dot" style="background:${m.color}" title="${esc(m.name)}"></span>`).join('')+`<span class="day-total">${events.length} 項事項</span>`;
@@ -1093,3 +1102,11 @@ if(!storageAvailable)toast('瀏覽器限制資料儲存：目前可試用，關�
 initSheetSync();
 if('serviceWorker' in navigator&&location.protocol==='https:')navigator.serviceWorker.register('./sw.js').catch(()=>{});
 
+
+
+// 國定假日只在本機決定顯示方式，不變更家庭雲端資料。
+const holidayToggleElement=document.getElementById('holidayToggle');
+if(holidayToggleElement){
+ holidayToggleElement.checked=HOLIDAYS.isVisible();
+ holidayToggleElement.addEventListener('change',()=>HOLIDAYS.setVisible(holidayToggleElement.checked));
+}
