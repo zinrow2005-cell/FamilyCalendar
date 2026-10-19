@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html><head><base target="_top"><meta charset="UTF-8"></head>
+<body style="font:12px sans-serif;color:#555">家日曆安全同步橋接器
+<script>
+'use strict';
+const FAMILY_PARENT_ORIGIN = <?!= JSON.stringify(origin) ?>;
+const FAMILY_NONCE = <?!= JSON.stringify(nonce) ?>;
+function ready(){window.top.postMessage({familySheetBridge:'ready',nonce:FAMILY_NONCE},FAMILY_PARENT_ORIGIN)}
+window.addEventListener('message',function(evt){
+ if(evt.origin!==FAMILY_PARENT_ORIGIN||evt.source!==window.top)return;
+ const m=evt.data;
+ if(!m||m.familySheetBridge!=='rpc'||m.nonce!==FAMILY_NONCE||!/^[a-zA-Z0-9_-]{1,70}$/.test(m.id||''))return;
+ const send=(kind,value)=>window.top.postMessage({familySheetBridge:kind,nonce:FAMILY_NONCE,id:m.id,value},FAMILY_PARENT_ORIGIN);
+ const runner=google.script.run.withSuccessHandler(res=>send('result',res)).withFailureHandler(err=>send('error',String(err&&err.message||err)));
+ if(m.action==='read')runner.apiRead(String(m.key||''));
+ else if(m.action==='write')runner.apiWrite(String(m.key||''),Number(m.version),m.patch);
+ else send('error','未知同步指令');
+});
+ready();
+</script></body></html>

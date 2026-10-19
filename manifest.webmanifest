@@ -1,0 +1,25 @@
+{
+  "name": "家日曆 V1.9｜家庭共用日曆",
+  "short_name": "家日曆",
+  "description": "家庭共用日曆、固定事項期限、批次排班、Google Sheets 家人同步。",
+  "lang": "zh-TW",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f8f9fe",
+  "theme_color": "#fbfbff",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
